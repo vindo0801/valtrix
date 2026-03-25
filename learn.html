@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Valtrix — Learning Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── LEARN-SPECIFIC STYLES ── */
+    .learn-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: 100vh;
+      padding-top: 64px;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      background: #fff;
+      border-right: 1px solid var(--border2);
+      padding: 2rem 0;
+      position: sticky;
+      top: 64px;
+      height: calc(100vh - 64px);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--mid) transparent;
+    }
+    .sidebar-user {
+      padding: 0 1.5rem 1.5rem;
+      border-bottom: 1px solid var(--border2);
+      margin-bottom: 1.2rem;
+    }
+    .user-greeting {
+      font-size: .72rem;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: .3rem;
+    }
+    .user-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 1px;
+      color: var(--cream);
+    }
+    .user-track-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      margin-top: .5rem;
+      padding: .25rem .7rem;
+      border-radius: 20px;
+      font-size: .72rem;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border: 1px solid;
+    }
+    .badge-digital { background: rgba(193,141,82,.12); color: var(--gold);  border-color: var(--border); }
+    .badge-green   { background: rgba(90,143,118,.12); color: var(--mid);   border-color: rgba(90,143,118,.3); }
+    .badge-agro    { background: rgba(150,205,176,.12);color: var(--light); border-color: rgba(150,205,176,.3); }
+
+    /* overall progress */
+    .sidebar-progress {
+      padding: 1rem 1.5rem;
+      margin-bottom: .5rem;
+    }
+    .prog-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: .72rem;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 1px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: .5rem;
+    }
+    .prog-bar-bg {
+      height: 5px;
+      background: var(--border2);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .prog-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--light));
+      border-radius: 3px;
+      transition: width .6s ease;
+    }
+
+    /* phase nav */
+    .phase-nav { display: flex; flex-direction: column; gap: .3rem; padding: 0 .8rem; }
+    .phase-nav-item {
+      display: flex;
+      flex-direction: column;
+      gap: .2rem;
+      padding: .7rem 1rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all var(--transition);
+      border: 1px solid transparent;
+      position: relative;
+    }
+    .phase-nav-item:hover { background: rgba(193,141,82,.06); border-color: var(--border2); }
+    .phase-nav-item.active { background: rgba(193,141,82,.1); border-color: var(--border); }
+    .phase-nav-item.locked { opacity: .45; cursor: not-allowed; }
+    .phase-nav-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .62rem;
+      letter-spacing: 1.5px;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+    .phase-nav-item.locked .phase-nav-label { color: var(--muted); }
+    .phase-nav-title { font-weight: 600; font-size: .88rem; color: var(--cream); }
+    .phase-nav-sub   { font-size: .75rem; color: var(--muted); }
+    .phase-lock-icon {
+      position: absolute;
+      right: 1rem; top: 50%;
+      transform: translateY(-50%);
+      font-size: .85rem;
+      opacity: .5;
+    }
+
+    /* module nav inside phase */
+    .module-nav {
+      display: flex;
+      flex-direction: column;
+      gap: .15rem;
+      margin-top: .3rem;
+      padding-left: .8rem;
+    }
+    .module-nav-item {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      padding: .4rem .7rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: .8rem;
+      color: var(--muted);
+      transition: all .2s;
+    }
+    .module-nav-item:hover { color: var(--cream); background: rgba(150,205,176,.06); }
+    .module-nav-item.active { color: var(--gold); font-weight: 500; }
+    .module-nav-item.done   { color: var(--mid); }
+    .module-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-active { background: var(--gold); }
+    .dot-done   { background: var(--mid); }
+    .dot-next   { background: var(--border2); }
+
+    /* ── MAIN CONTENT ── */
+    .learn-main {
+      background: #f5f7f5;
+      overflow-y: auto;
+    }
+
+    /* topbar inside main */
+    .learn-topbar {
+      padding: 1.5rem 2.5rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .breadcrumb {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .68rem;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .breadcrumb span { color: var(--gold); }
+
+    /* content area */
+    .learn-content { padding: 2rem 2.5rem 4rem; }
+
+    /* ── MODULE HEADER ── */
+    .module-header { margin-bottom: 2rem; }
+    .module-phase-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .68rem;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      margin-bottom: .7rem;
+    }
+    .module-phase-tag::before {
+      content: '';
+      width: 16px; height: 2px;
+      background: var(--gold);
+      display: inline-block;
+    }
+    .module-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      letter-spacing: 1.5px;
+      line-height: 1.05;
+      margin-bottom: .8rem;
+    }
+    .module-meta {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      font-size: .78rem;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── VIDEO PLAYER ── */
+    .video-container {
+      background: #fff;
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    .video-wrapper {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+    }
+    .video-wrapper iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: none;
+    }
+    .video-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      background: rgba(240,247,243,.6);
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .video-placeholder:hover { background: rgba(240,247,243,.4); }
+    .play-btn {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .video-placeholder:hover .play-btn {
+      transform: scale(1.1);
+      box-shadow: 0 8px 24px rgba(193,141,82,.5);
+    }
+    .video-placeholder-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2rem;
+      letter-spacing: 1px;
+      color: var(--cream);
+    }
+    .video-placeholder-sub { font-size: .8rem; color: var(--muted); }
+
+    /* ── READING MATERIAL ── */
+    .reading-card {
+      background: #fff;
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      line-height: 1.8;
+    }
+    .reading-card h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 1px;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+    .reading-card p { font-size: .92rem; color: var(--muted); margin-bottom: 1rem; }
+    .reading-card p:last-child { margin-bottom: 0; }
+    .reading-card ul { padding-left: 1.2rem; display: flex; flex-direction: column; gap: .5rem; margin-bottom: 1rem; }
+    .reading-card ul li { font-size: .9rem; color: var(--muted); line-height: 1.6; }
+    .reading-card strong { color: var(--cream); font-weight: 600; }
+    .reading-card .highlight-box {
+      background: rgba(193,141,82,.08);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--gold);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 1rem 1.2rem;
+      margin: 1.2rem 0;
+      font-size: .88rem;
+      color: var(--cream);
+    }
+
+    /* ── CHECKLIST ── */
+    .checklist-card {
+      background: #fff;
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    .checklist-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.3rem;
+    }
+    .checklist-header h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 1px;
+    }
+    .checklist-progress-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .68rem;
+      letter-spacing: 1.5px;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+    .checklist-items { display: flex; flex-direction: column; gap: .7rem; }
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: .9rem;
+      padding: .9rem 1rem;
+      background: rgba(240,247,243,.5);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all var(--transition);
+      user-select: none;
+    }
+    .checklist-item:hover { border-color: rgba(193,141,82,.3); background: rgba(193,141,82,.04); }
+    .checklist-item.checked { border-color: rgba(90,143,118,.3); background: rgba(90,143,118,.06); }
+    .check-box {
+      width: 20px; height: 20px;
+      border: 2px solid var(--border2);
+      border-radius: 4px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .2s;
+      margin-top: 1px;
+    }
+    .checklist-item.checked .check-box {
+      background: var(--mid);
+      border-color: var(--mid);
+    }
+    .check-tick { color: var(--darkest); font-size: .75rem; font-weight: 700; opacity: 0; transition: opacity .2s; }
+    .checklist-item.checked .check-tick { opacity: 1; }
+    .check-text h4 { font-size: .88rem; font-weight: 600; margin-bottom: .2rem; transition: color .2s; }
+    .checklist-item.checked .check-text h4 { color: var(--muted); text-decoration: line-through; }
+    .check-text p  { font-size: .78rem; color: var(--muted); line-height: 1.5; }
+
+    /* ── QUIZ ── */
+    .quiz-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    .quiz-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    .quiz-card-header h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 1px;
+      color: var(--cream);
+    }
+    .quiz-counter {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .68rem;
+      letter-spacing: 1.5px;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+    .learn-quiz-options { display: flex; flex-direction: column; gap: .6rem; }
+    .learn-quiz-opt {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      padding: .85rem 1.1rem;
+      background: rgba(240,247,243,.6);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: .88rem;
+      color: var(--muted);
+      transition: all .2s;
+    }
+    .learn-quiz-opt:hover:not(.locked-opt) { border-color: var(--gold); color: var(--cream); }
+    .learn-quiz-opt.selected-opt { border-color: var(--gold); color: var(--cream); background: rgba(193,141,82,.08); }
+    .learn-quiz-opt.correct-opt  { border-color: var(--mid);  color: var(--light); background: rgba(90,143,118,.1); }
+    .learn-quiz-opt.wrong-opt    { border-color: #e05252;     color: #f0a0a0;      background: rgba(224,82,82,.06); }
+    .learn-quiz-opt.locked-opt   { cursor: default; }
+    .opt-letter {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      border: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .7rem;
+      flex-shrink: 0;
+      transition: all .2s;
+    }
+    .selected-opt .opt-letter { border-color: var(--gold); color: var(--gold); }
+    .correct-opt  .opt-letter { border-color: var(--mid);  background: var(--mid);  color: var(--darkest); }
+    .wrong-opt    .opt-letter { border-color: #e05252;     background: #e05252;     color: #fff; }
+    .quiz-feedback {
+      margin-top: 1rem;
+      padding: .9rem 1.1rem;
+      border-radius: var(--radius);
+      font-size: .85rem;
+      display: none;
+    }
+    .quiz-feedback.show { display: block; }
+    .quiz-feedback.correct { background: rgba(90,143,118,.1); border: 1px solid rgba(90,143,118,.3); color: var(--light); }
+    .quiz-feedback.wrong   { background: rgba(224,82,82,.08); border: 1px solid rgba(224,82,82,.2);  color: #f0a0a0; }
+    .quiz-nav { display: flex; gap: .8rem; margin-top: 1.2rem; align-items: center; }
+    .quiz-score-banner {
+      text-align: center;
+      padding: 2rem;
+      display: none;
+    }
+    .quiz-score-banner.show { display: block; }
+    .quiz-score-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 4rem;
+      letter-spacing: 1px;
+      line-height: 1;
+      margin-bottom: .5rem;
+    }
+    .quiz-score-pass { color: var(--light); }
+    .quiz-score-fail { color: #e05252; }
+    .unlock-banner {
+      background: rgba(90,143,118,.1);
+      border: 1px solid rgba(90,143,118,.3);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      margin-top: 1.5rem;
+    }
+    .unlock-icon { font-size: 2rem; flex-shrink: 0; }
+    .unlock-text h4 { font-weight: 600; font-size: .95rem; margin-bottom: .3rem; color: var(--light); }
+    .unlock-text p  { font-size: .82rem; color: var(--muted); }
+
+    /* ── NEXT MODULE CTA ── */
+    .next-module-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 1.5rem;
+      background: #fff;
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-lg);
+      margin-top: 2rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .next-module-info { display: flex; flex-direction: column; gap: .2rem; }
+    .next-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .62rem;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .next-title { font-weight: 600; font-size: .9rem; }
+
+    /* ── LOGIN GATE ── */
+    .login-gate {
+      min-height: calc(100vh - 64px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .login-gate-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 3rem 2.5rem;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+    .gate-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .gate-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      letter-spacing: 1.5px;
+      margin-bottom: .8rem;
+    }
+    .gate-sub { font-size: .92rem; color: var(--muted); line-height: 1.7; margin-bottom: 2rem; }
+    .gate-form { display: flex; flex-direction: column; gap: 1rem; text-align: left; }
+    .gate-divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: .5rem 0;
+    }
+    .gate-divider::before,
+    .gate-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border2);
+    }
+    .gate-divider span { font-size: .75rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .learn-layout { grid-template-columns: 1fr; }
+      .sidebar {
+        position: static;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border2);
+      }
+      .learn-content { padding: 1.5rem; }
+      .learn-topbar  { padding: 1.2rem 1.5rem 0; }
+    }
+  </style>
+</head>
+<body class="en">
+
+<!-- NAV (same style as main site) -->
+<nav>
+  <div class="nav-logo" onclick="window.location.href='index.html'"><img src="logo.PNG" alt="Valtrix" style="height:52px;object-fit:contain;vertical-align:middle;display:inline-block;"></div>
+  <ul class="nav-links">
+    <li><a href="index.html" data-nav-en="← Home" data-nav-id="← Beranda">← Home</a></li>
+    <li><a href="#" id="nav-phase-label" style="color:var(--gold);">Phase 1</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="lang-row">
+      <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn"        data-lang="id" onclick="setLang('id')">ID</button>
+    </div>
+    <div id="nav-user-display" style="display:none;align-items:center;gap:.6rem;">
+      <div style="width:30px;height:30px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700;color:var(--darkest);" id="nav-avatar">B</div>
+      <span style="font-size:.82rem;color:var(--muted);" id="nav-username">Budi</span>
+    </div>
+    <button class="btn btn-sm btn-outline-gold" id="nav-logout" onclick="logout()" style="display:none;">
+      <span class="en-text">Logout</span>
+      <span class="id-text" style="display:none">Keluar</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ════ LOGIN GATE (shown when not logged in) ════ -->
+<div id="login-gate" class="login-gate" style="display:none;">
+  <div class="login-gate-card">
+    <div class="gate-icon">🔐</div>
+    <h2 class="gate-title en-text">ACCESS YOUR LEARNING</h2>
+    <h2 class="gate-title id-text" style="display:none">AKSES PEMBELAJARAN</h2>
+    <p class="gate-sub en-text">Enter your registered email to continue your 90-day journey. No password needed — we'll find your account.</p>
+    <p class="gate-sub id-text" style="display:none">Masukkan email yang sudah kamu daftarkan untuk melanjutkan perjalanan 90 harimu. Tidak perlu password.</p>
+
+    <div class="gate-form">
+      <div class="form-group">
+        <label class="form-label en-text">Registered Email</label>
+        <label class="form-label id-text" style="display:none">Email Terdaftar</label>
+        <input id="gate-email" class="form-input" type="email" placeholder="e.g. budi@email.com" onkeydown="if(event.key==='Enter')gateLogin()">
+      </div>
+      <div class="form-group">
+        <label class="form-label en-text">Your Name (as registered)</label>
+        <label class="form-label id-text" style="display:none">Nama Kamu (sesuai pendaftaran)</label>
+        <input id="gate-name" class="form-input" type="text" placeholder="e.g. Budi Santoso" onkeydown="if(event.key==='Enter')gateLogin()">
+      </div>
+      <button class="btn btn-primary btn-full" onclick="gateLogin()">
+        <span class="en-text">🚀 Enter Learning Dashboard</span>
+        <span class="id-text" style="display:none">🚀 Masuk Dashboard Belajar</span>
+      </button>
+
+      <div class="gate-divider"><span>OR</span></div>
+
+      <button class="btn btn-secondary btn-full" onclick="window.location.href='index.html'">
+        <span class="en-text">Register First →</span>
+        <span class="id-text" style="display:none">Daftar Dulu →</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ LEARN LAYOUT (shown when logged in) ════ -->
+<div id="learn-app" class="learn-layout" style="display:none;">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-user">
+      <div class="user-greeting en-text">Welcome back</div>
+      <div class="user-greeting id-text" style="display:none">Selamat datang kembali</div>
+      <div class="user-name" id="sidebar-username">Budi Santoso</div>
+      <div id="sidebar-track-badge" class="user-track-badge badge-digital">💻 Digital Services</div>
+    </div>
+
+    <div class="sidebar-progress">
+      <div class="prog-label">
+        <span class="en-text">Overall Progress</span>
+        <span class="id-text" style="display:none">Progres Keseluruhan</span>
+        <span id="overall-pct">0%</span>
+      </div>
+      <div class="prog-bar-bg">
+        <div class="prog-bar-fill" id="overall-bar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="phase-nav" id="phase-nav"></div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="learn-main">
+    <div class="learn-topbar">
+      <div class="breadcrumb" id="breadcrumb">
+        <span class="en-text">Phase</span>
+        <span class="id-text" style="display:none">Fase</span>
+        › <span id="bc-phase">1</span> ›
+        <span id="bc-module" style="color:var(--text);">Module 1</span>
+      </div>
+      <div style="display:flex;gap:.5rem;align-items:center;">
+        <span id="module-completion-badge" style="display:none;font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:1.5px;padding:.25rem .7rem;border-radius:3px;background:rgba(90,143,118,.15);color:var(--mid);border:1px solid rgba(90,143,118,.3);text-transform:uppercase;">✓ Completed</span>
+      </div>
+    </div>
+
+    <div class="learn-content" id="learn-content">
+      <!-- content rendered by JS -->
+    </div>
+  </main>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="script.js"></script>
+<script>
+'use strict';
+
+// ─── CURRICULUM DATA ───────────────────────────────────────────
+const CURRICULUM = {
+  en: [
+    {
+      phase: 1,
+      label: 'Phase 1 · Week 1–4',
+      title: 'Micro-Credential Training',
+      sub: '4 modules · 40 hours',
+      modules: [
+        {
+          id: 'p1m1',
+          title: 'Understanding the Digital Economy',
+          duration: '45 min',
+          type: 'video+reading+checklist+quiz',
+          videoId: 'dQw4w9WgXcQ', // placeholder YouTube ID
+          videoTitle: 'The Digital Economy & Your Opportunity',
+          reading: {
+            title: 'Why the Digital Economy is Your Gateway',
+            content: `
+              <p>The digital economy refers to economic activities that are enabled by digital technologies. In Indonesia, this sector is growing at <strong>40% annually</strong> — meaning new jobs are being created faster than they can be filled.</p>
+              <div class="highlight-box">💡 Key Insight: While 79,302 workers lost manufacturing jobs in 2025, digital platforms created over 2 million new freelance opportunities — yet fewer than 8% of laid-off workers transitioned into them.</div>
+              <p>The three most accessible entry points for workers transitioning from manufacturing or traditional sectors are:</p>
+              <ul>
+                <li><strong>Social Media Management</strong> — Every Indonesian business needs someone to manage their online presence</li>
+                <li><strong>Content Creation</strong> — Video, photo, and written content for e-commerce platforms</li>
+                <li><strong>Digital Advertising</strong> — Running ads on Google, Meta, TikTok for small businesses</li>
+              </ul>
+              <p>The good news: none of these require a degree. They require <strong>90 days of focused training</strong> and practical experience — exactly what Valtrix provides.</p>
+            `
+          },
+          checklist: {
+            title: 'Module 1 Tasks',
+            items: [
+              { id: 'p1m1t1', title: 'Watch the intro video', desc: 'Complete the full 45-minute video above' },
+              { id: 'p1m1t2', title: 'Read the material', desc: 'Read "Why the Digital Economy is Your Gateway" fully' },
+              { id: 'p1m1t3', title: 'Take notes on 3 key insights', desc: 'Write down your 3 biggest takeaways from this module' },
+              { id: 'p1m1t4', title: 'Join the cohort WhatsApp group', desc: 'Click the link sent to your registered email' },
+            ]
+          },
+          quiz: {
+            title: 'Module 1 Quiz',
+            passMark: 3,
+            questions: [
+              {
+                q: 'How fast is Indonesia\'s digital economy growing annually?',
+                opts: ['10%', '25%', '40%', '60%'],
+                correct: 2,
+                explanation: 'Indonesia\'s digital economy grows at ~40% annually, creating massive new employment opportunities.'
+              },
+              {
+                q: 'Which of the following is the most accessible entry point for laid-off manufacturing workers?',
+                opts: ['Machine Learning Engineering', 'Social Media Management', 'Blockchain Development', 'Cloud Architecture'],
+                correct: 1,
+                explanation: 'Social Media Management requires no degree, uses familiar tools (phones & apps), and has immediate demand from Indonesian SMEs.'
+              },
+              {
+                q: 'What percentage of laid-off workers transitioned into digital platform jobs in 2025?',
+                opts: ['8%', '25%', '45%', '60%'],
+                correct: 0,
+                explanation: 'Only 8% made the transition — which is why Valtrix exists to close this gap.'
+              },
+              {
+                q: 'How long does Valtrix\'s program take to place workers into new roles?',
+                opts: ['30 days', '60 days', '90 days', '180 days'],
+                correct: 2,
+                explanation: '90 days: 4 weeks training → 4 weeks live project → 4 weeks placement.'
+              },
+            ]
+          }
+        },
+        {
+          id: 'p1m2',
+          title: 'AI Tools for Non-Tech Workers',
+          duration: '50 min',
+          type: 'video+reading+checklist+quiz',
+          videoId: 'dQw4w9WgXcQ',
+          videoTitle: 'Using AI Tools Without a Tech Background',
+          reading: {
+            title: 'Your AI Toolkit — No Coding Required',
+            content: `
+              <p>The rise of AI tools has democratized digital work. Tools that previously required programming knowledge can now be operated by anyone with a smartphone.</p>
+              <div class="highlight-box">🔧 Your Essential AI Toolkit: ChatGPT (writing), Canva AI (design), CapCut AI (video editing), Google Bard (research), Meta AI (social media)</div>
+              <p>As a <strong>Chatbot Trainer</strong> — one of the fastest-growing roles in Indonesia — your job is to teach AI systems how to respond to Indonesian customers. This does not require coding. It requires:</p>
+              <ul>
+                <li>Understanding of common customer questions in your industry</li>
+                <li>Ability to write clear, natural Indonesian language</li>
+                <li>Basic ability to test and evaluate AI responses</li>
+              </ul>
+              <p>Companies pay <strong>Rp5–10M/month</strong> for good Chatbot Trainers because they reduce customer service costs by 60-80%.</p>
+            `
+          },
+          checklist: {
+            title: 'Module 2 Tasks',
+            items: [
+              { id: 'p1m2t1', title: 'Create a free ChatGPT account', desc: 'Go to chat.openai.com and register with your email' },
+              { id: 'p1m2t2', title: 'Complete the AI Tools video', desc: 'Watch the full 50-minute video' },
+              { id: 'p1m2t3', title: 'Practice Prompt #1', desc: 'Write a customer service response for an online shop using ChatGPT' },
+              { id: 'p1m2t4', title: 'Create a free Canva account', desc: 'Go to canva.com and make your first design' },
+            ]
+          },
+          quiz: {
+            title: 'Module 2 Quiz',
+            passMark: 3,
+            questions: [
+              {
+                q: 'What does a Chatbot Trainer primarily do?',
+                opts: ['Write computer code for AI systems', 'Teach AI how to respond to customer questions', 'Build websites from scratch', 'Manage social media accounts'],
+                correct: 1,
+                explanation: 'A Chatbot Trainer teaches AI systems to respond correctly to customers — no coding required.'
+              },
+              {
+                q: 'By how much can good Chatbot Trainers reduce company customer service costs?',
+                opts: ['10-20%', '30-40%', '60-80%', '90-100%'],
+                correct: 2,
+                explanation: 'Well-trained chatbots can handle 60-80% of routine inquiries, dramatically reducing costs.'
+              },
+              {
+                q: 'Which AI tool is best for creating social media graphics quickly?',
+                opts: ['ChatGPT', 'Canva AI', 'Google Bard', 'CapCut'],
+                correct: 1,
+                explanation: 'Canva AI specializes in design and graphics, making it ideal for social media content creation.'
+              },
+              {
+                q: 'What is the typical monthly salary for a skilled Chatbot Trainer in Indonesia?',
+                opts: ['Rp1–2M', 'Rp3–4M', 'Rp5–10M', 'Rp20–30M'],
+                correct: 2,
+                explanation: 'Skilled Chatbot Trainers earn Rp5–10M/month, well above the manufacturing sector average.'
+              },
+            ]
+          }
+        },
+        {
+          id: 'p1m3',
+          title: 'Social Media Fundamentals',
+          duration: '55 min',
+          type: 'video+reading+checklist+quiz',
+          videoId: 'dQw4w9WgXcQ',
+          videoTitle: 'Social Media for Business — Indonesian Market',
+          reading: {
+            title: 'The Indonesian Social Media Landscape',
+            content: `
+              <p>Indonesia has <strong>191 million active social media users</strong> — the 4th largest in the world. Every business needs help reaching them. This is your opportunity.</p>
+              <div class="highlight-box">📊 Platform Priority for Indonesian SMEs: Instagram (78%), TikTok (65%), Facebook (58%), YouTube (45%). Start with Instagram and TikTok.</div>
+              <p>As a <strong>Social Media Manager</strong>, your core responsibilities are:</p>
+              <ul>
+                <li>Creating and scheduling content (3-5 posts per week per client)</li>
+                <li>Responding to comments and messages (community management)</li>
+                <li>Running basic paid promotions (boosted posts)</li>
+                <li>Reporting monthly performance metrics to clients</li>
+              </ul>
+              <p>Most Social Media Managers handle <strong>3-5 clients simultaneously</strong>, earning Rp2-3M per client per month = <strong>total Rp7-15M/month</strong>.</p>
+            `
+          },
+          checklist: {
+            title: 'Module 3 Tasks',
+            items: [
+              { id: 'p1m3t1', title: 'Complete Social Media video', desc: 'Watch the full 55-minute session' },
+              { id: 'p1m3t2', title: 'Audit one local business Instagram', desc: 'Find a local business and analyze their last 10 posts' },
+              { id: 'p1m3t3', title: 'Create a content calendar template', desc: 'Design a simple 1-week content calendar in Canva' },
+              { id: 'p1m3t4', title: 'Write 3 sample captions', desc: 'Write Instagram captions for a bakery, a clothing store, and a food stall' },
+            ]
+          },
+          quiz: {
+            title: 'Module 3 Quiz',
+            passMark: 3,
+            questions: [
+              { q: 'How many active social media users does Indonesia have?', opts: ['50 million', '100 million', '191 million', '300 million'], correct: 2, explanation: 'Indonesia has 191 million active social media users — the 4th largest globally.' },
+              { q: 'Which two platforms should you prioritize for Indonesian SMEs?', opts: ['Facebook & Twitter', 'Instagram & TikTok', 'LinkedIn & YouTube', 'Snapchat & Pinterest'], correct: 1, explanation: 'Instagram and TikTok have the highest engagement rates for Indonesian SMEs.' },
+              { q: 'How many clients can a Social Media Manager typically handle?', opts: ['1–2', '3–5', '8–10', '15–20'], correct: 1, explanation: '3–5 clients is the typical workload, balancing quality and income.' },
+              { q: 'What is the earning potential managing 5 clients at Rp3M each?', opts: ['Rp5M', '10M', 'Rp15M', 'Rp20M'], correct: 2, explanation: '5 clients × Rp3M = Rp15M/month — well above the manufacturing average.' },
+            ]
+          }
+        },
+        {
+          id: 'p1m4',
+          title: 'Micro-Credential Assessment',
+          duration: '30 min',
+          type: 'checklist+quiz',
+          reading: null,
+          videoId: null,
+          checklist: {
+            title: 'Final Phase 1 Checklist',
+            items: [
+              { id: 'p1m4t1', title: 'Complete all 3 previous modules', desc: 'Modules 1, 2, and 3 must be 100% finished' },
+              { id: 'p1m4t2', title: 'Submit your practice portfolio', desc: 'Email 3 sample works to mentor@valtrix.id' },
+              { id: 'p1m4t3', title: 'Attend live Q&A session', desc: 'Join the Wednesday 7PM Zoom session with your cohort' },
+            ]
+          },
+          quiz: {
+            title: '🏆 Phase 1 Final Assessment — Unlock Phase 2',
+            passMark: 4,
+            isFinal: true,
+            questions: [
+              { q: 'The digital economy in Indonesia grows at what annual rate?', opts: ['10%', '25%', '40%', '55%'], correct: 2, explanation: '40% annual growth creates massive opportunities for reskilled workers.' },
+              { q: 'A Chatbot Trainer\'s primary skill requirement is:', opts: ['Computer programming', 'Clear communication & language', 'Data science', 'Graphic design'], correct: 1, explanation: 'Chatbot training is about language and customer understanding — no coding needed.' },
+              { q: 'To earn Rp15M/month as a Social Media Manager, you need approximately:', opts: ['1 client', '3 clients', '5 clients', '10 clients'], correct: 2, explanation: '5 clients × Rp3M = Rp15M/month is the standard formula.' },
+              { q: 'Which platform combination is most important for Indonesian SME marketing?', opts: ['Facebook & Twitter', 'Instagram & TikTok', 'LinkedIn & Pinterest', 'YouTube & Snapchat'], correct: 1, explanation: 'Instagram and TikTok dominate Indonesian SME digital marketing.' },
+              { q: 'Valtrix\'s Phase 2 involves:', opts: ['More classroom training', 'A live industry project with revenue share', 'Job interview preparation only', 'Self-study at home'], correct: 1, explanation: 'Phase 2 is a real project with a partner company — earning 30% revenue share.' },
+            ]
+          }
+        }
+      ]
+    },
+    {
+      phase: 2,
+      label: 'Phase 2 · Week 5–8',
+      title: 'Industry Live Project',
+      sub: '3 modules · Live work',
+      locked: true,
+      unlockCondition: 'Pass Phase 1 Final Assessment (80%)',
+      modules: [
+        { id: 'p2m1', title: 'Getting Matched to Your Employer', duration: '20 min', type: 'reading+checklist', locked: true },
+        { id: 'p2m2', title: 'Your First Live Project Brief', duration: '30 min', type: 'reading+checklist', locked: true },
+        { id: 'p2m3', title: 'Revenue Share & Performance Review', duration: '25 min', type: 'reading+checklist', locked: true },
+      ]
+    },
+    {
+      phase: 3,
+      label: 'Phase 3 · Week 9–12',
+      title: 'Contract Placement',
+      sub: '2 modules · Placement',
+      locked: true,
+      unlockCondition: 'Complete Phase 2 Live Project',
+      modules: [
+        { id: 'p3m1', title: 'Contract Signing & Onboarding', duration: '20 min', type: 'reading+checklist', locked: true },
+        { id: 'p3m2', title: 'Career Growth Beyond 6 Months', duration: '30 min', type: 'reading', locked: true },
+      ]
+    }
+  ],
+  id: [] // ID curriculum mirrors EN, translated dynamically where needed
+};
+
+// ─── APP STATE ─────────────────────────────────────────────────
+const LEARN = {
+  user: null,
+  currentPhase: 0,
+  currentModule: 0,
+  progress: JSON.parse(localStorage.getItem('valtrix_progress') || '{}'),
+  quizState: { current: 0, answered: null, score: 0, finished: false },
+};
+
+// ─── SAVE PROGRESS ─────────────────────────────────────────────
+function saveProgress() {
+  localStorage.setItem('valtrix_progress', JSON.stringify(LEARN.progress));
+  updateOverallProgress();
+}
+
+// ─── LOGIN GATE ─────────────────────────────────────────────────
+function gateLogin() {
+  const email = document.getElementById('gate-email').value.trim();
+  const name  = document.getElementById('gate-name').value.trim();
+
+  if (!email || !name) {
+    showToast(APP.lang === 'en' ? 'Please enter your email and name.' : 'Masukkan email dan nama kamu.', 'error');
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showToast(APP.lang === 'en' ? 'Please enter a valid email.' : 'Masukkan email yang valid.', 'error');
+    return;
+  }
+
+  // Simulate login — in production this would verify against database
+  const storedUser = JSON.parse(localStorage.getItem('valtrix_user') || 'null');
+
+  // Accept any name/email for demo; in prod would verify
+  const track = storedUser?.track || 'digital';
+  LEARN.user = { name, email, track };
+  localStorage.setItem('valtrix_user', JSON.stringify(LEARN.user));
+
+  initLearnApp();
+}
+
+function logout() {
+  LEARN.user = null;
+  document.getElementById('learn-app').style.display = 'none';
+  document.getElementById('login-gate').style.display = 'flex';
+  document.getElementById('nav-user-display').style.display = 'none';
+  document.getElementById('nav-logout').style.display = 'none';
+}
+
+// ─── INIT LEARN APP ────────────────────────────────────────────
+function initLearnApp() {
+  document.getElementById('login-gate').style.display = 'none';
+  document.getElementById('learn-app').style.display = 'grid';
+
+  // nav user display
+  const navUserEl = document.getElementById('nav-user-display');
+  const navAvatarEl = document.getElementById('nav-avatar');
+  const navUsernameEl = document.getElementById('nav-username');
+  navUserEl.style.display = 'flex';
+  navAvatarEl.textContent = LEARN.user.name.charAt(0).toUpperCase();
+  navUsernameEl.textContent = LEARN.user.name.split(' ')[0];
+  document.getElementById('nav-logout').style.display = 'flex';
+
+  // sidebar
+  document.getElementById('sidebar-username').textContent = LEARN.user.name;
+  const trackBadge = document.getElementById('sidebar-track-badge');
+  const trackData = {
+    digital: { cls: 'badge-digital', label: '💻 Digital Services' },
+    green:   { cls: 'badge-green',   label: '🌱 Green Economy' },
+    agro:    { cls: 'badge-agro',    label: '🌾 Agro-Industry 4.0' },
+  };
+  const td = trackData[LEARN.user.track] || trackData.digital;
+  trackBadge.className = `user-track-badge ${td.cls}`;
+  trackBadge.textContent = td.label;
+
+  renderSidebar();
+  renderModule(0, 0);
+  updateOverallProgress();
+}
+
+// ─── SIDEBAR ───────────────────────────────────────────────────
+function renderSidebar() {
+  const nav = document.getElementById('phase-nav');
+  nav.innerHTML = '';
+  const curriculum = CURRICULUM.en;
+
+  curriculum.forEach((phase, pi) => {
+    // phase header
+    const phaseEl = document.createElement('div');
+    phaseEl.className = `phase-nav-item ${pi === LEARN.currentPhase ? 'active' : ''} ${phase.locked && !isPhaseUnlocked(pi) ? 'locked' : ''}`;
+    const isLocked = phase.locked && !isPhaseUnlocked(pi);
+    phaseEl.innerHTML = `
+      <div class="phase-nav-label">${phase.label}</div>
+      <div class="phase-nav-title">${phase.title}</div>
+      <div class="phase-nav-sub">${phase.sub}</div>
+      ${isLocked ? '<span class="phase-lock-icon">🔒</span>' : ''}
+    `;
+    if (!isLocked) {
+      phaseEl.addEventListener('click', () => {
+        LEARN.currentPhase = pi;
+        LEARN.currentModule = 0;
+        renderSidebar();
+        renderModule(pi, 0);
+      });
+    } else {
+      phaseEl.title = phase.unlockCondition || 'Complete previous phase to unlock';
+    }
+    nav.appendChild(phaseEl);
+
+    // module list (only show for current phase)
+    if (pi === LEARN.currentPhase && !isLocked) {
+      const moduleList = document.createElement('div');
+      moduleList.className = 'module-nav';
+      phase.modules.forEach((mod, mi) => {
+        const isDone   = LEARN.progress[mod.id]?.completed;
+        const isActive = mi === LEARN.currentModule;
+        const item = document.createElement('div');
+        item.className = `module-nav-item ${isActive ? 'active' : ''} ${isDone ? 'done' : ''}`;
+        item.innerHTML = `
+          <span class="module-dot ${isActive ? 'dot-active' : isDone ? 'dot-done' : 'dot-next'}"></span>
+          <span>${mod.title}</span>
+        `;
+        item.addEventListener('click', () => {
+          LEARN.currentModule = mi;
+          renderSidebar();
+          renderModule(pi, mi);
+        });
+        moduleList.appendChild(item);
+      });
+      nav.appendChild(moduleList);
+    }
+  });
+}
+
+// ─── PHASE UNLOCK LOGIC ────────────────────────────────────────
+function isPhaseUnlocked(phaseIdx) {
+  if (phaseIdx === 0) return true;
+  // Phase 2 unlocked if Phase 1 final quiz passed
+  if (phaseIdx === 1) return !!LEARN.progress['p1m4_quiz_passed'];
+  // Phase 3 unlocked if Phase 2 all modules done
+  if (phaseIdx === 2) return !!LEARN.progress['p2_completed'];
+  return false;
+}
+
+// ─── OVERALL PROGRESS ──────────────────────────────────────────
+function updateOverallProgress() {
+  const totalModules = CURRICULUM.en.reduce((sum, p) => sum + p.modules.length, 0);
+  const doneModules  = Object.values(LEARN.progress).filter(v => v?.completed).length;
+  const pct = Math.round((doneModules / totalModules) * 100);
+  document.getElementById('overall-pct').textContent = pct + '%';
+  document.getElementById('overall-bar').style.width = pct + '%';
+}
+
+// ─── RENDER MODULE ─────────────────────────────────────────────
+function renderModule(phaseIdx, moduleIdx) {
+  const phase  = CURRICULUM.en[phaseIdx];
+  const mod    = phase.modules[moduleIdx];
+  const prog   = LEARN.progress[mod.id] || {};
+
+  LEARN.currentPhase  = phaseIdx;
+  LEARN.currentModule = moduleIdx;
+
+  // breadcrumb & nav
+  document.getElementById('bc-phase').textContent  = phaseIdx + 1;
+  document.getElementById('bc-module').textContent = mod.title;
+  document.getElementById('nav-phase-label').textContent = `Phase ${phaseIdx + 1}`;
+
+  // completion badge
+  const badge = document.getElementById('module-completion-badge');
+  badge.style.display = prog.completed ? 'inline-flex' : 'none';
+
+  const content = document.getElementById('learn-content');
+  let html = '';
+
+  // ── MODULE HEADER ──
+  html += `
+    <div class="module-header">
+      <div class="module-phase-tag">${phase.label} · Module ${moduleIdx + 1}</div>
+      <h1 class="module-title">${mod.title}</h1>
+      <div class="module-meta">
+        ${mod.duration ? `<span class="meta-item">⏱ ${mod.duration}</span>` : ''}
+        <span class="meta-item">📚 ${formatType(mod.type)}</span>
+        ${prog.completed ? '<span class="meta-item" style="color:var(--mid);">✓ Completed</span>' : ''}
+      </div>
+    </div>
+  `;
+
+  // ── VIDEO ──
+  if (mod.videoId) {
+    html += `
+      <div class="video-container">
+        <div class="video-wrapper" id="video-wrapper-${mod.id}">
+          <div class="video-placeholder" onclick="loadVideo('${mod.videoId}', '${mod.id}')">
+            <div class="play-btn">▶</div>
+            <div class="video-placeholder-title">${mod.videoTitle || mod.title}</div>
+            <div class="video-placeholder-sub">Click to play · ${mod.duration}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ── READING ──
+  if (mod.reading) {
+    html += `
+      <div class="reading-card">
+        <h3>📖 ${mod.reading.title}</h3>
+        ${mod.reading.content}
+      </div>
+    `;
+  }
+
+  // ── CHECKLIST ──
+  if (mod.checklist) {
+    const totalTasks = mod.checklist.items.length;
+    const doneTasks  = mod.checklist.items.filter(t => LEARN.progress[t.id]).length;
+    html += `
+      <div class="checklist-card">
+        <div class="checklist-header">
+          <h3>✅ ${mod.checklist.title}</h3>
+          <span class="checklist-progress-text" id="cl-progress-${mod.id}">${doneTasks}/${totalTasks} done</span>
+        </div>
+        <div class="checklist-items">
+          ${mod.checklist.items.map(task => `
+            <div class="checklist-item ${LEARN.progress[task.id] ? 'checked' : ''}"
+                 onclick="toggleTask('${task.id}', '${mod.id}', ${totalTasks})"
+                 id="task-${task.id}">
+              <div class="check-box">
+                <span class="check-tick">✓</span>
+              </div>
+              <div class="check-text">
+                <h4>${task.title}</h4>
+                <p>${task.desc}</p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // ── QUIZ ──
+  if (mod.quiz) {
+    html += renderQuizHTML(mod, prog);
+  }
+
+  // ── NEXT MODULE ──
+  const nextMod = getNextModule(phaseIdx, moduleIdx);
+  if (nextMod) {
+    html += `
+      <div class="next-module-bar">
+        <div class="next-module-info">
+          <span class="next-label">Up Next</span>
+          <span class="next-title">${nextMod.title}</span>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="renderModule(${nextMod.phaseIdx},${nextMod.moduleIdx})">
+          Next Module →
+        </button>
+      </div>
+    `;
+  }
+
+  content.innerHTML = html;
+  content.scrollTop = 0;
+
+  // re-init quiz events
+  if (mod.quiz) initQuizEvents(mod);
+  renderSidebar();
+}
+
+function formatType(type) {
+  if (!type) return '';
+  const map = { video:'Video', reading:'Reading', checklist:'Tasks', quiz:'Quiz' };
+  return type.split('+').map(t => map[t] || t).join(' · ');
+}
+
+function getNextModule(pi, mi) {
+  const phase = CURRICULUM.en[pi];
+  if (mi < phase.modules.length - 1) return { phaseIdx: pi, moduleIdx: mi + 1, title: phase.modules[mi+1].title };
+  if (pi < CURRICULUM.en.length - 1 && isPhaseUnlocked(pi + 1)) {
+    return { phaseIdx: pi + 1, moduleIdx: 0, title: CURRICULUM.en[pi+1].modules[0].title };
+  }
+  return null;
+}
+
+// ─── VIDEO LOAD ────────────────────────────────────────────────
+function loadVideo(videoId, modId) {
+  const wrapper = document.getElementById(`video-wrapper-${modId}`);
+  if (!wrapper) return;
+  wrapper.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
+  // mark video as watched in progress
+  if (!LEARN.progress[modId]) LEARN.progress[modId] = {};
+  LEARN.progress[modId].videoWatched = true;
+  saveProgress();
+}
+
+// ─── CHECKLIST TOGGLE ─────────────────────────────────────────
+function toggleTask(taskId, modId, totalTasks) {
+  LEARN.progress[taskId] = !LEARN.progress[taskId];
+  const el = document.getElementById(`task-${taskId}`);
+  if (el) el.classList.toggle('checked', !!LEARN.progress[taskId]);
+
+  // update counter
+  const mod = findModById(modId);
+  if (mod?.checklist) {
+    const done = mod.checklist.items.filter(t => LEARN.progress[t.id]).length;
+    const counter = document.getElementById(`cl-progress-${modId}`);
+    if (counter) counter.textContent = `${done}/${totalTasks} done`;
+  }
+  saveProgress();
+}
+
+// ─── QUIZ RENDERER ────────────────────────────────────────────
+function renderQuizHTML(mod, prog) {
+  const q = mod.quiz;
+  const passed = LEARN.progress[mod.id + '_quiz_passed'];
+
+  if (passed) {
+    return `
+      <div class="quiz-card">
+        <div class="quiz-score-banner show">
+          <div class="quiz-score-num quiz-score-pass">✓ PASSED</div>
+          <p style="color:var(--muted);font-size:.88rem;">You already passed this quiz. ${q.isFinal ? 'Phase 2 is unlocked!' : 'Keep going!'}</p>
+          ${q.isFinal ? `<div class="unlock-banner"><span class="unlock-icon">🔓</span><div class="unlock-text"><h4>Phase 2 Unlocked!</h4><p>You can now access Industry Live Project modules.</p></div></div>` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="quiz-card" id="quiz-card-${mod.id}">
+      <div class="quiz-card-header">
+        <h3>${q.title}</h3>
+        <span class="quiz-counter" id="qcounter-${mod.id}">1 / ${q.questions.length}</span>
+      </div>
+      <div id="quiz-body-${mod.id}">
+        ${renderQuizQuestion(mod, 0)}
+      </div>
+    </div>
+  `;
+}
+
+function renderQuizQuestion(mod, qIdx) {
+  const q = mod.quiz.questions[qIdx];
+  return `
+    <div class="quiz-progress-bar" style="margin-bottom:1rem;">
+      <div class="quiz-progress-fill" style="width:${((qIdx)/mod.quiz.questions.length)*100}%"></div>
+    </div>
+    <div class="quiz-question" style="margin-bottom:1.2rem;font-size:.95rem;font-weight:500;line-height:1.55;">${q.q}</div>
+    <div class="learn-quiz-options" id="qopts-${mod.id}">
+      ${q.opts.map((opt,i) => `
+        <div class="learn-quiz-opt" id="qopt-${mod.id}-${i}" onclick="selectQuizOpt('${mod.id}',${qIdx},${i})">
+          <span class="opt-letter">${String.fromCharCode(65+i)}</span>
+          <span>${opt}</span>
+        </div>
+      `).join('')}
+    </div>
+    <div class="quiz-feedback" id="qfeedback-${mod.id}"></div>
+    <div class="quiz-nav" id="qnav-${mod.id}">
+      <button class="btn btn-primary btn-sm" id="qbtn-${mod.id}" onclick="confirmQuizAnswer('${mod.id}',${qIdx})" style="display:none;">
+        Confirm Answer
+      </button>
+    </div>
+  `;
+}
+
+let quizCurrentAnswer = {};
+
+function selectQuizOpt(modId, qIdx, optIdx) {
+  // deselect all
+  const mod = findModById(modId);
+  if (!mod) return;
+  const n = mod.quiz.questions[qIdx].opts.length;
+  for (let i = 0; i < n; i++) {
+    const el = document.getElementById(`qopt-${modId}-${i}`);
+    if (el) el.classList.remove('selected-opt');
+  }
+  // select chosen
+  const el = document.getElementById(`qopt-${modId}-${optIdx}`);
+  if (el) el.classList.add('selected-opt');
+  quizCurrentAnswer[modId] = optIdx;
+
+  // show confirm button
+  const btn = document.getElementById(`qbtn-${modId}`);
+  if (btn) { btn.style.display = 'flex'; btn.textContent = 'Confirm Answer'; }
+}
+
+function confirmQuizAnswer(modId, qIdx) {
+  const mod = findModById(modId);
+  if (!mod) return;
+  const chosen  = quizCurrentAnswer[modId];
+  if (chosen === undefined) return;
+
+  const correct = mod.quiz.questions[qIdx].correct;
+  const explanation = mod.quiz.questions[qIdx].explanation;
+  const isCorrect = chosen === correct;
+
+  if (!LEARN.progress[modId + '_quiz']) LEARN.progress[modId + '_quiz'] = { score: 0, total: 0 };
+  LEARN.progress[modId + '_quiz'].total++;
+  if (isCorrect) LEARN.progress[modId + '_quiz'].score++;
+
+  // color options
+  for (let i = 0; i < mod.quiz.questions[qIdx].opts.length; i++) {
+    const el = document.getElementById(`qopt-${modId}-${i}`);
+    if (!el) continue;
+    el.classList.remove('selected-opt');
+    el.classList.add('locked-opt');
+    if (i === correct) el.classList.add('correct-opt');
+    else if (i === chosen && !isCorrect) el.classList.add('wrong-opt');
+  }
+
+  // feedback
+  const fb = document.getElementById(`qfeedback-${modId}`);
+  if (fb) {
+    fb.className = `quiz-feedback show ${isCorrect ? 'correct' : 'wrong'}`;
+    fb.innerHTML = `${isCorrect ? '✅ Correct!' : '❌ Incorrect.'} ${explanation}`;
+  }
+
+  // button → next or finish
+  const btn = document.getElementById(`qbtn-${modId}`);
+  const isLast = qIdx >= mod.quiz.questions.length - 1;
+  if (btn) {
+    btn.textContent = isLast ? 'See Results' : 'Next Question →';
+    btn.onclick = isLast
+      ? () => finishQuiz(modId)
+      : () => advanceQuiz(modId, qIdx + 1);
+  }
+}
+
+function advanceQuiz(modId, nextQIdx) {
+  const mod = findModById(modId);
+  if (!mod) return;
+  const body = document.getElementById(`quiz-body-${modId}`);
+  if (body) body.innerHTML = renderQuizQuestion(mod, nextQIdx);
+  const counter = document.getElementById(`qcounter-${modId}`);
+  if (counter) counter.textContent = `${nextQIdx + 1} / ${mod.quiz.questions.length}`;
+  initQuizEvents(mod); // rebind
+}
+
+function finishQuiz(modId) {
+  const mod = findModById(modId);
+  if (!mod) return;
+  const score = LEARN.progress[modId + '_quiz']?.score || 0;
+  const total = mod.quiz.questions.length;
+  const pass  = score >= mod.quiz.passMark;
+  const pct   = Math.round((score / total) * 100);
+
+  if (pass) {
+    LEARN.progress[modId + '_quiz_passed'] = true;
+    if (mod.quiz.isFinal) LEARN.progress['p1m4_quiz_passed'] = true;
+    // mark module complete
+    if (!LEARN.progress[modId]) LEARN.progress[modId] = {};
+    LEARN.progress[modId].completed = true;
+    saveProgress();
+    showToast(APP.lang === 'en' ? `🎉 Passed! Score: ${score}/${total}` : `🎉 Lulus! Skor: ${score}/${total}`, 'success');
+  } else {
+    // reset score for retry
+    delete LEARN.progress[modId + '_quiz'];
+    saveProgress();
+    showToast(APP.lang === 'en' ? `Score: ${score}/${total}. Need ${mod.quiz.passMark}. Try again!` : `Skor: ${score}/${total}. Perlu ${mod.quiz.passMark}. Coba lagi!`, 'error');
+  }
+
+  const body = document.getElementById(`quiz-body-${modId}`);
+  if (!body) return;
+
+  if (pass) {
+    body.innerHTML = `
+      <div class="quiz-score-banner show">
+        <div class="quiz-score-num quiz-score-pass">${pct}%</div>
+        <p style="color:var(--muted);font-size:.9rem;margin-bottom:1rem;">You passed! Score: ${score} / ${total}</p>
+        ${mod.quiz.isFinal ? `
+          <div class="unlock-banner">
+            <span class="unlock-icon">🔓</span>
+            <div class="unlock-text">
+              <h4>Phase 2 Unlocked!</h4>
+              <p>You can now access the Industry Live Project modules. Check the sidebar.</p>
+            </div>
+          </div>
+        ` : `<button class="btn btn-primary btn-sm" onclick="renderModule(${LEARN.currentPhase},${LEARN.currentModule+1<CURRICULUM.en[LEARN.currentPhase].modules.length ? LEARN.currentModule+1:LEARN.currentModule})">Continue →</button>`}
+      </div>
+    `;
+    renderSidebar();
+  } else {
+    body.innerHTML = `
+      <div class="quiz-score-banner show">
+        <div class="quiz-score-num quiz-score-fail">${pct}%</div>
+        <p style="color:var(--muted);font-size:.9rem;margin-bottom:1rem;">Not quite. Score: ${score} / ${total} — Need ${mod.quiz.passMark} to pass.</p>
+        <button class="btn btn-primary btn-sm" onclick="renderModule(${LEARN.currentPhase},${LEARN.currentModule})">Try Again</button>
+      </div>
+    `;
+  }
+}
+
+function initQuizEvents(mod) {
+  // no-op — events are inline onclick, no rebind needed
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────
+function findModById(id) {
+  for (const phase of CURRICULUM.en) {
+    for (const mod of phase.modules) {
+      if (mod.id === id) return mod;
+    }
+  }
+  return null;
+}
+
+// ─── LANGUAGE ─────────────────────────────────────────────────
+function setLang(lang) {
+  APP.lang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  document.querySelectorAll('.en-text').forEach(el => el.style.display = lang === 'en' ? '' : 'none');
+  document.querySelectorAll('.id-text').forEach(el => el.style.display = lang === 'id' ? '' : 'none');
+  document.querySelectorAll('[data-nav-en]').forEach(a => { a.textContent = lang === 'en' ? a.dataset.navEn : a.dataset.navId; });
+}
+
+// ─── BOOT ─────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  setLang('en');
+
+  // Check if coming from index.html registration flow
+  const stored = JSON.parse(localStorage.getItem('valtrix_user') || 'null');
+
+  // Also check if APP.user was set (same-tab navigation)
+  const fromReg = window.opener === null && document.referrer.includes('index.html');
+
+  if (stored) {
+    LEARN.user = stored;
+    initLearnApp();
+  } else {
+    document.getElementById('login-gate').style.display = 'flex';
+  }
+});
+</script>
+</body>
+</html>

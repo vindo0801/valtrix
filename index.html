@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Valtrix — Turn Layoffs Into Futures</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="en">
+
+<!-- ═══ TOAST CONTAINER ═══ -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ═══ EMAIL POPUP ═══ -->
+<div class="modal-overlay" id="popup-email" style="z-index:1000;">
+  <div class="modal" style="max-width:480px;text-align:center;">
+    <button class="modal-close" onclick="closePopup()" style="position:absolute;top:1.2rem;right:1.2rem;">✕</button>
+    <div style="margin-bottom:1.2rem;"><img src="logo.PNG" alt="Valtrix" style="height:64px;object-fit:contain;mix-blend-mode:multiply;"></div>
+    <div class="modal-title en-text" style="font-size:1.6rem;margin-bottom:.5rem;">DON'T GET LEFT BEHIND</div>
+    <div class="modal-title id-text" style="display:none;font-size:1.6rem;margin-bottom:.5rem;">JANGAN TERTINGGAL</div>
+    <p style="font-size:.88rem;color:var(--muted);line-height:1.7;margin-bottom:.4rem;" class="en-text">Indonesia's labor crisis is here. <strong style="color:var(--text);">79,302 workers</strong> were laid off in 2025 alone.</p>
+    <p style="font-size:.88rem;color:var(--muted);line-height:1.7;margin-bottom:.4rem;" class="id-text" style="display:none">Krisis ketenagakerjaan sudah terjadi. <strong style="color:var(--text);">79.302 pekerja</strong> di-PHK sepanjang 2025.</p>
+    <p style="font-size:.88rem;color:var(--muted);line-height:1.7;margin-bottom:1.5rem;" class="en-text">Get your <strong style="color:var(--gold);">free PHK Risk Score</strong> + early access to the 90-day reskilling program.</p>
+    <p style="font-size:.88rem;color:var(--muted);line-height:1.7;margin-bottom:1.5rem;" class="id-text" style="display:none">Dapatkan <strong style="color:var(--gold);">Skor Risiko PHK gratis</strong> + akses awal ke program reskilling 90 hari.</p>
+    <div style="display:flex;flex-direction:column;gap:.75rem;">
+      <input id="popup-email-input" class="form-input" type="email" placeholder="Enter your email address..." style="text-align:center;font-size:.95rem;" onkeydown="if(event.key==='Enter')submitPopupEmail()">
+      <button class="btn btn-primary btn-full" onclick="submitPopupEmail()" style="font-size:.95rem;">
+        <span class="en-text">Get Free Risk Assessment →</span>
+        <span class="id-text" style="display:none">Dapatkan Asesmen Risiko Gratis →</span>
+      </button>
+      <button onclick="closePopup()" style="background:none;border:none;color:var(--muted);font-size:.78rem;cursor:pointer;text-decoration:underline;" class="en-text">No thanks, I'll take my chances</button>
+      <button onclick="closePopup()" style="background:none;border:none;color:var(--muted);font-size:.78rem;cursor:pointer;text-decoration:underline;display:none;" class="id-text">Tidak, terima kasih</button>
+    </div>
+    <p style="font-size:.7rem;color:var(--muted);margin-top:1rem;" class="en-text">🔒 No spam. Unsubscribe anytime. Free for all laid-off workers.</p>
+    <p style="font-size:.7rem;color:var(--muted);margin-top:1rem;" class="id-text" style="display:none">🔒 Tanpa spam. Bisa berhenti kapan saja. Gratis untuk pekerja ter-PHK.</p>
+  </div>
+</div>
+
+<!-- ═══ NAV ═══ -->
+<nav>
+  <div class="nav-logo" onclick="window.scrollTo({top:0,behavior:'smooth'})"><img src="logo.PNG" alt="Valtrix" style="height:52px;object-fit:contain;vertical-align:middle;display:inline-block;"></div>
+  <ul class="nav-links">
+    <li><a href="#crisis"   data-nav-en="Crisis"    data-nav-id="Krisis">Crisis</a></li>
+    <li><a href="#tracks"   data-nav-en="3 Tracks"  data-nav-id="3 Jalur">3 Tracks</a></li>
+    <li><a href="#program"  data-nav-en="Program"   data-nav-id="Program">Program</a></li>
+    <li><a href="#radar"    data-nav-en="PHK Radar" data-nav-id="PHK Radar">PHK Radar</a></li>
+    <li><a href="#impact"   data-nav-en="Impact"    data-nav-id="Dampak">Impact</a></li>
+    <li><a href="#employer" data-nav-en="Employers" data-nav-id="Employer">Employers</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="lang-row">
+      <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn"        data-lang="id" onclick="setLang('id')">ID</button>
+    </div>
+    <button class="nav-cta btn" onclick="openModal('modal-register')">
+      <span class="en-text">Join Now</span>
+      <span class="id-text" style="display:none">Daftar</span>
+    </button>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-logo-wrap">
+      <img src="logo.PNG" alt="Valtrix" class="hero-logo">
+    </div>
+    <div class="eyebrow">
+      <span class="en-text">Indonesia · Youth Employment Crisis · 2026</span>
+      <span class="id-text" style="display:none">Indonesia · Krisis Pengangguran Pemuda · 2026</span>
+    </div>
+    <h1>
+      <span class="en-text">TURN<br><span class="accent">LAYOFFS</span><br>INTO <span class="accent2">FUTURES</span></span>
+      <span class="id-text" style="display:none">UBAH<br><span class="accent">PHK</span><br>JADI <span class="accent2">PELUANG</span></span>
+    </h1>
+    <p class="hero-sub en-text">AI-powered reskilling platform transforming Indonesia's laid-off workers into skilled professionals — in just 90 days.</p>
+    <p class="hero-sub id-text" style="display:none">Platform reskilling berbasis AI yang mengubah pekerja ter-PHK Indonesia menjadi tenaga ahli — hanya dalam 90 hari.</p>
+
+    <div class="hero-cta">
+      <button class="btn btn-primary btn-lg" onclick="openModal('modal-register')">
+        <span class="en-text">🚀 Start Your Journey</span>
+        <span class="id-text" style="display:none">🚀 Mulai Perjalananmu</span>
+      </button>
+      <button class="btn btn-secondary btn-lg" onclick="initQuiz()">
+        <span class="en-text">🎯 Find My Track</span>
+        <span class="id-text" style="display:none">🎯 Temukan Jalurku</span>
+      </button>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-num accent" data-counter="3.55" data-suffix="M" data-decimals="2">3.55M</span>
+        <span class="stat-label en-text">Unemployed Youth</span>
+        <span class="stat-label id-text" style="display:none">Pemuda Menganggur</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" data-counter="79302" data-suffix="">79,302</span>
+        <span class="stat-label en-text">Layoffs Jan–Nov 2025</span>
+        <span class="stat-label id-text" style="display:none">PHK Jan–Nov 2025</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" data-counter="54.9" data-suffix="%" data-decimals="1">54.9%</span>
+        <span class="stat-label en-text">Workers: SD–SMP Only</span>
+        <span class="stat-label id-text" style="display:none">Pekerja Lulusan SD–SMP</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num" data-counter="90" data-suffix=" days">90 days</span>
+        <span class="stat-label en-text">To New Career</span>
+        <span class="stat-label id-text" style="display:none">Menuju Karir Baru</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══ CRISIS ═══ -->
+<section id="crisis" class="reveal">
+  <div class="section-label">
+    <span class="en-text">Root Cause Analysis</span>
+    <span class="id-text" style="display:none">Analisis Akar Masalah</span>
+  </div>
+  <h2 class="section-title en-text">3 STRUCTURAL DISEASES</h2>
+  <h2 class="section-title id-text" style="display:none">3 PENYAKIT STRUKTURAL</h2>
+  <p class="section-sub en-text">Indonesia's labor crisis stems from three compounding forces destroying formal employment simultaneously.</p>
+  <p class="section-sub id-text" style="display:none">Krisis ketenagakerjaan Indonesia berasal dari tiga kekuatan berlapis yang menghancurkan lapangan kerja formal secara bersamaan.</p>
+  <div class="disease-grid">
+    <div class="disease-card auto reveal reveal-delay-1">
+      <div class="disease-pct">40%</div>
+      <div class="disease-title en-text">⚙️ Industrial Automation</div>
+      <div class="disease-title id-text" style="display:none">⚙️ Otomatisasi Industri</div>
+      <ul class="disease-list">
+        <li class="en-text">40 textile factories closed in 2025 → 25,000 direct layoffs</li>
+        <li class="id-text" style="display:none">40 pabrik tekstil tutup 2025 → 25.000 PHK langsung</li>
+        <li class="en-text">China AI robots & auto-looms boost productivity +300%</li>
+        <li class="id-text" style="display:none">Robot AI & mesin tenun otomatis tingkatkan produktivitas +300%</li>
+        <li class="en-text">Manual assembly-line workers replaced by Industry 4.0</li>
+        <li class="id-text" style="display:none">Pekerja manual assembly line digantikan Industry 4.0</li>
+      </ul>
+    </div>
+    <div class="disease-card corp reveal reveal-delay-2">
+      <div class="disease-pct">35%</div>
+      <div class="disease-title en-text">📉 Profit-Driven Efficiency</div>
+      <div class="disease-title id-text" style="display:none">📉 Efisiensi Korporasi</div>
+      <ul class="disease-list">
+        <li class="en-text">Global inflation 4.2% + Rupiah Rp16,500/USD squeeze margins</li>
+        <li class="id-text" style="display:none">Inflasi 4,2% + Rupiah Rp16.500/USD tekan margin</li>
+        <li class="en-text">Companies cut 20–30% labor costs for profitability</li>
+        <li class="id-text" style="display:none">Perusahaan potong 20–30% biaya tenaga kerja</li>
+        <li class="en-text">Efficiency focus over hiring during global slowdown</li>
+        <li class="id-text" style="display:none">Fokus efisiensi bukan rekrutmen saat perlambatan global</li>
+      </ul>
+    </div>
+    <div class="disease-card skill reveal reveal-delay-3">
+      <div class="disease-pct">25%</div>
+      <div class="disease-title en-text">🎓 Hilirisasi Skill Gap</div>
+      <div class="disease-title id-text" style="display:none">🎓 Kesenjangan Skill Hilirisasi</div>
+      <ul class="disease-list">
+        <li class="en-text">Prabowo's program needs 8M smelter engineers & tech specialists</li>
+        <li class="id-text" style="display:none">Program Prabowo butuh 8 juta engineer smelter & teknisi</li>
+        <li class="en-text">Reality: 54.9% workers are only SD–SMP level operators</li>
+        <li class="id-text" style="display:none">Realitas: 54,9% pekerja hanya operator level SD–SMP</li>
+        <li class="en-text">1.01M graduates also unready for new industry competencies</li>
+        <li class="id-text" style="display:none">1,01 juta sarjana pun tidak siap kompetensi industri baru</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SDG BAND ═══ -->
+<div class="sdg-band reveal">
+  <div class="section-label">
+    <span class="en-text">SDG Alignment</span>
+    <span class="id-text" style="display:none">Kesesuaian SDGs</span>
+  </div>
+  <div class="sdg-grid">
+    <div class="sdg-card"><div class="sdg-badge">SDG 8</div><div class="sdg-text"><h4>Target 8.3</h4><p class="en-text">Inclusive industrialization — hilirisasi needs high-skill workers</p><p class="id-text" style="display:none">Industrialisasi inklusif — hilirisasi butuh pekerja skill tinggi</p></div></div>
+    <div class="sdg-card"><div class="sdg-badge">SDG 8</div><div class="sdg-text"><h4>Target 8.6</h4><p class="en-text">Reduce NEET youth 15% — 3.55M youth aged 15–24</p><p class="id-text" style="display:none">Kurangi NEET pemuda 15% — 3,55 juta pemuda usia 15–24</p></div></div>
+    <div class="sdg-card"><div class="sdg-badge">SDG 9</div><div class="sdg-text"><h4>Target 9.2</h4><p class="en-text">Sustainable industry — automation vs manual workers</p><p class="id-text" style="display:none">Industri berkelanjutan — otomatisasi vs pekerja manual</p></div></div>
+    <div class="sdg-card"><div class="sdg-badge">SDG 4</div><div class="sdg-text"><h4>Target 4.4</h4><p class="en-text">Future industry skills — 54.9% only SD–SMP education</p><p class="id-text" style="display:none">Skill industri masa depan — 54,9% hanya SD–SMP</p></div></div>
+  </div>
+</div>
+
+<!-- ═══ 3 TRACKS ═══ -->
+<section id="tracks" class="reveal">
+  <div class="section-label">
+    <span class="en-text">The Solution</span>
+    <span class="id-text" style="display:none">Solusinya</span>
+  </div>
+  <h2 class="section-title en-text">3 TRANSFORMATION TRACKS</h2>
+  <h2 class="section-title id-text" style="display:none">3 JALUR TRANSFORMASI</h2>
+  <p class="section-sub en-text">Three parallel pathways targeting automation-resistant sectors. Take the quiz to find your best fit.</p>
+  <p class="section-sub id-text" style="display:none">Tiga jalur paralel yang menargetkan sektor tahan otomatisasi. Ikuti kuis untuk menemukan jalur terbaikmu.</p>
+  <div class="tracks-grid">
+    <div class="track-card digital reveal reveal-delay-1">
+      <div class="track-header">
+        <div class="track-pct">60%</div>
+        <div class="track-icon">💻</div>
+        <div class="track-title en-text">DIGITAL SERVICES</div>
+        <div class="track-title id-text" style="display:none">LAYANAN DIGITAL</div>
+      </div>
+      <div class="track-body">
+        <div class="track-jobs">
+          <div class="job-tag"><span class="job-dot"></span>Chatbot Trainer / AI Trainer</div>
+          <div class="job-tag"><span class="job-dot"></span>Social Media Manager</div>
+          <div class="job-tag"><span class="job-dot"></span>Google Ads Specialist</div>
+          <div class="job-tag"><span class="job-dot"></span>Content Creator</div>
+        </div>
+        <button class="track-apply-btn" onclick="initQuiz()">
+          <span class="en-text">Take Quiz → Find Out If This Is You</span>
+          <span class="id-text" style="display:none">Ikuti Kuis → Cek Apakah Jalur Ini Untukmu</span>
+        </button>
+      </div>
+    </div>
+    <div class="track-card green reveal reveal-delay-2">
+      <div class="track-header">
+        <div class="track-pct">25%</div>
+        <div class="track-icon">🌱</div>
+        <div class="track-title en-text">GREEN ECONOMY</div>
+        <div class="track-title id-text" style="display:none">EKONOMI HIJAU</div>
+      </div>
+      <div class="track-body">
+        <div class="track-jobs">
+          <div class="job-tag"><span class="job-dot"></span><span class="en-text">PLTS Rooftop Installer</span><span class="id-text" style="display:none">Installer Panel Surya</span></div>
+          <div class="job-tag"><span class="job-dot"></span><span class="en-text">Waste-to-Energy Operator</span><span class="id-text" style="display:none">Operator Waste-to-Energy</span></div>
+          <div class="job-tag"><span class="job-dot"></span><span class="en-text">EV Technician</span><span class="id-text" style="display:none">Teknisi Kendaraan Listrik</span></div>
+          <div class="job-tag"><span class="job-dot"></span><span class="en-text">Green Building Inspector</span><span class="id-text" style="display:none">Inspektor Gedung Hijau</span></div>
+        </div>
+        <button class="track-apply-btn" onclick="initQuiz()">
+          <span class="en-text">Take Quiz → Find Out If This Is You</span>
+          <span class="id-text" style="display:none">Ikuti Kuis → Cek Apakah Jalur Ini Untukmu</span>
+        </button>
+      </div>
+    </div>
+    <div class="track-card agro reveal reveal-delay-3">
+      <div class="track-header">
+        <div class="track-pct">15%</div>
+        <div class="track-icon">🌾</div>
+        <div class="track-title en-text">AGRO-INDUSTRY 4.0</div>
+        <div class="track-title id-text" style="display:none">AGRO-INDUSTRI 4.0</div>
+      </div>
+      <div class="track-body">
+        <div class="track-jobs">
+          <div class="job-tag"><span class="job-dot"></span>Smart Farming IoT</div>
+          <div class="job-tag"><span class="job-dot"></span><span class="en-text">Cold Chain Logistics</span><span class="id-text" style="display:none">Logistik Cold Chain</span></div>
+          <div class="job-tag"><span class="job-dot"></span><span class="en-text">Drone Agriculture Operator</span><span class="id-text" style="display:none">Operator Drone Pertanian</span></div>
+          <div class="job-tag"><span class="job-dot"></span><span class="en-text">Food Tech Specialist</span><span class="id-text" style="display:none">Spesialis Food Tech</span></div>
+        </div>
+        <button class="track-apply-btn" onclick="initQuiz()">
+          <span class="en-text">Take Quiz → Find Out If This Is You</span>
+          <span class="id-text" style="display:none">Ikuti Kuis → Cek Apakah Jalur Ini Untukmu</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 90-DAY SIMULATION ═══ -->
+<section id="program" style="background:var(--dark);" class="reveal">
+  <div class="section-label">
+    <span class="en-text">Valtrix Methodology</span>
+    <span class="id-text" style="display:none">Metodologi Valtrix</span>
+  </div>
+  <h2 class="section-title en-text">YOUR 90-DAY JOURNEY</h2>
+  <h2 class="section-title id-text" style="display:none">PERJALANAN 90 HARI KAMU</h2>
+  <p class="section-sub en-text">Click each phase to explore what happens. Then start your simulation to walk through it step by step.</p>
+  <p class="section-sub id-text" style="display:none">Klik setiap fase untuk melihat detailnya. Lalu mulai simulasimu untuk menelusurinya langkah demi langkah.</p>
+
+  <!-- inline preview (not modal) -->
+  <div id="sim-phases-container" style="display:flex;flex-direction:column;gap:1.2rem;max-width:700px;"></div>
+
+  <div style="display:flex;gap:1rem;margin-top:2rem;flex-wrap:wrap;align-items:center;">
+    <button class="btn btn-primary" id="sim-next-btn" onclick="simNextPhase()">
+      <span class="en-text">Next Phase →</span>
+      <span class="id-text" style="display:none">Fase Berikutnya →</span>
+    </button>
+    <button class="btn btn-secondary" id="sim-done-btn" style="display:none" onclick="simComplete()">
+      <span class="en-text">🎉 Register Now</span>
+      <span class="id-text" style="display:none">🎉 Daftar Sekarang</span>
+    </button>
+    <span id="sim-progress-label" style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:1px;"></span>
+  </div>
+
+  <!-- CTA to start learning -->
+  <div style="margin-top:3rem;padding:2rem;background:var(--dark);border:1px solid var(--border);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1.5rem;">
+    <div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:.5rem;">Ready to start?</div>
+      <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:1px;" class="en-text">BEGIN YOUR 90-DAY JOURNEY NOW</h3>
+      <h3 style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:1px;" class="id-text" style="display:none">MULAI PERJALANAN 90 HARI SEKARANG</h3>
+      <p style="font-size:.85rem;color:var(--muted);margin-top:.4rem;" class="en-text">Register and access your full learning dashboard — videos, modules, quizzes, and live projects.</p>
+      <p style="font-size:.85rem;color:var(--muted);margin-top:.4rem;" class="id-text" style="display:none">Daftar dan akses dashboard belajar lengkap — video, modul, kuis, dan proyek langsung.</p>
+    </div>
+    <div style="display:flex;gap:.8rem;flex-wrap:wrap;">
+      <button class="btn btn-primary btn-lg" onclick="openModal('modal-register')">
+        <span class="en-text">🚀 Register & Start Learning</span>
+        <span class="id-text" style="display:none">🚀 Daftar & Mulai Belajar</span>
+      </button>
+      <a href="learn.html" class="btn btn-secondary btn-lg">
+        <span class="en-text">Already registered? →</span>
+        <span class="id-text" style="display:none">Sudah daftar? →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PHK RADAR ═══ -->
+<section id="radar" class="radar-section reveal">
+  <div class="section-label">PHK Radar™</div>
+  <div class="radar-wrapper">
+    <div class="radar-display">
+      <div class="radar-title-row">
+        <h3 class="en-text">SECTOR RISK MONITOR</h3>
+        <h3 class="id-text" style="display:none">MONITOR RISIKO SEKTOR</h3>
+        <div class="radar-live">
+          <div class="pulse"></div>
+          <span class="en-text">LIVE DEMO</span>
+          <span class="id-text" style="display:none">DEMO LANGSUNG</span>
+        </div>
+      </div>
+      <div class="sector-list">
+        <div class="sector-row">
+          <div class="sector-info">
+            <span class="sector-name en-text">Textile Manufacturing</span>
+            <span class="sector-name id-text" style="display:none">Manufaktur Tekstil</span>
+            <span class="sector-risk risk-high en-text">HIGH RISK</span>
+            <span class="sector-risk risk-high id-text" style="display:none">RISIKO TINGGI</span>
+          </div>
+          <div class="sector-bar-bg"><div class="sector-bar bar-high" data-width="88%" style="width:0"></div></div>
+        </div>
+        <div class="sector-row">
+          <div class="sector-info">
+            <span class="sector-name en-text">Digital Media / Content</span>
+            <span class="sector-name id-text" style="display:none">Media Digital / Konten</span>
+            <span class="sector-risk risk-high en-text">HIGH RISK</span>
+            <span class="sector-risk risk-high id-text" style="display:none">RISIKO TINGGI</span>
+          </div>
+          <div class="sector-bar-bg"><div class="sector-bar bar-high" data-width="74%" style="width:0"></div></div>
+        </div>
+        <div class="sector-row">
+          <div class="sector-info">
+            <span class="sector-name en-text">Basic Data Entry / Admin</span>
+            <span class="sector-name id-text" style="display:none">Data Entry / Admin Dasar</span>
+            <span class="sector-risk risk-high en-text">HIGH RISK</span>
+            <span class="sector-risk risk-high id-text" style="display:none">RISIKO TINGGI</span>
+          </div>
+          <div class="sector-bar-bg"><div class="sector-bar bar-high" data-width="70%" style="width:0"></div></div>
+        </div>
+        <div class="sector-row">
+          <div class="sector-info">
+            <span class="sector-name en-text">Retail / Traditional Trade</span>
+            <span class="sector-name id-text" style="display:none">Retail / Perdagangan Tradisional</span>
+            <span class="sector-risk risk-mid en-text">MEDIUM</span>
+            <span class="sector-risk risk-mid id-text" style="display:none">MENENGAH</span>
+          </div>
+          <div class="sector-bar-bg"><div class="sector-bar bar-mid" data-width="52%" style="width:0"></div></div>
+        </div>
+        <div class="sector-row">
+          <div class="sector-info">
+            <span class="sector-name en-text">Green Energy / Solar</span>
+            <span class="sector-name id-text" style="display:none">Energi Hijau / Solar</span>
+            <span class="sector-risk risk-low en-text">LOW RISK</span>
+            <span class="sector-risk risk-low id-text" style="display:none">RISIKO RENDAH</span>
+          </div>
+          <div class="sector-bar-bg"><div class="sector-bar bar-low" data-width="18%" style="width:0"></div></div>
+        </div>
+        <div class="sector-row">
+          <div class="sector-info">
+            <span class="sector-name en-text">Smart Agriculture</span>
+            <span class="sector-name id-text" style="display:none">Pertanian Cerdas</span>
+            <span class="sector-risk risk-low en-text">LOW RISK</span>
+            <span class="sector-risk risk-low id-text" style="display:none">RISIKO RENDAH</span>
+          </div>
+          <div class="sector-bar-bg"><div class="sector-bar bar-low" data-width="12%" style="width:0"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="radar-info reveal">
+      <h3 class="en-text">PREDICT <span class="accent">LAYOFFS</span><br>BEFORE THEY HAPPEN</h3>
+      <h3 class="id-text" style="display:none">PREDIKSI <span class="accent">PHK</span><br>SEBELUM TERJADI</h3>
+      <p class="en-text">PHK Radar™ doesn't spy on individuals — it analyzes macro & micro signals across industries to give workers a 6-month head start on reskilling.</p>
+      <p class="id-text" style="display:none">PHK Radar™ tidak memata-matai individu — melainkan menganalisis sinyal makro & mikro lintas industri untuk memberi pekerja waktu 6 bulan sebelum PHK terjadi.</p>
+      <div class="accuracy-badge">
+        <div class="accuracy-num">85%</div>
+        <div class="accuracy-label">
+          <strong class="en-text">Prediction Accuracy</strong>
+          <strong class="id-text" style="display:none">Akurasi Prediksi</strong><br>
+          <span class="en-text">6 months advance warning</span>
+          <span class="id-text" style="display:none">Peringatan 6 bulan sebelumnya</span>
+        </div>
+      </div>
+      <button class="btn btn-outline-gold" onclick="openModal('modal-radar-how')">
+        <span class="en-text">🔍 How Does It Work? →</span>
+        <span class="id-text" style="display:none">🔍 Bagaimana Cara Kerjanya? →</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ RADAR HOW-IT-WORKS MODAL ═══ -->
+<div class="modal-overlay" id="modal-radar-how">
+  <div class="modal" style="max-width:780px;">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title en-text">HOW PHK RADAR™ WORKS</div>
+        <div class="modal-title id-text" style="display:none">CARA KERJA PHK RADAR™</div>
+        <p style="font-size:.82rem;color:var(--muted);margin-top:.3rem;" class="en-text">AI-powered layoff prediction — not surveillance, but signal intelligence</p>
+        <p style="font-size:.82rem;color:var(--muted);margin-top:.3rem;" class="id-text" style="display:none">Prediksi PHK berbasis AI — bukan pengawasan, melainkan intelijen sinyal</p>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-radar-how')">✕</button>
+    </div>
+
+    <!-- CORE CONCEPT -->
+    <div class="radar-modal-concept">
+      <div class="concept-pill en-text">💡 Key Concept</div>
+      <div class="concept-pill id-text" style="display:none">💡 Konsep Utama</div>
+      <p class="en-text" style="font-size:.9rem;color:var(--muted);line-height:1.7;margin-top:.7rem;">PHK Radar™ doesn't track individuals — it predicts which <strong style="color:var(--text);">sectors & companies</strong> will downsize, then alerts registered workers in those sectors to start reskilling before it's too late.</p>
+      <p class="id-text" style="display:none;font-size:.9rem;color:var(--muted);line-height:1.7;margin-top:.7rem;">PHK Radar™ tidak melacak individu — sistem memprediksi <strong style="color:var(--text);">sektor & perusahaan</strong> mana yang akan melakukan efisiensi, lalu memberi peringatan ke pekerja terdaftar di sektor tersebut agar mulai reskilling sebelum terlambat.</p>
+    </div>
+
+    <!-- 2 FUNCTIONS: MAKRO & MIKRO -->
+    <div class="radar-modal-section">
+      <div class="rms-label en-text">Step 1 — Signal Collection</div>
+      <div class="rms-label id-text" style="display:none">Langkah 1 — Pengumpulan Sinyal</div>
+      <h4 class="rms-title en-text">Macro & Micro Analysis</h4>
+      <h4 class="rms-title id-text" style="display:none">Analisis Makro & Mikro</h4>
+      <div class="macro-micro-grid">
+        <div class="mm-card macro">
+          <div class="mm-header">
+            <span class="mm-icon">🌐</span>
+            <div>
+              <div class="mm-tag en-text">MACRO</div>
+              <div class="mm-tag id-text" style="display:none">MAKRO</div>
+              <div class="mm-subtitle en-text">External / National</div>
+              <div class="mm-subtitle id-text" style="display:none">Eksternal / Nasional</div>
+            </div>
+          </div>
+          <p class="mm-desc en-text">Monitors national economic conditions and global industry trends.</p>
+          <p class="mm-desc id-text" style="display:none">Memantau kondisi ekonomi nasional dan tren industri global.</p>
+          <div class="mm-signals">
+            <span class="signal-tag">📉 Kurs Rupiah</span>
+            <span class="signal-tag">📊 Laju Inflasi</span>
+            <span class="signal-tag">🤖 Adopsi AI Global</span>
+            <span class="signal-tag">🏭 Program Hilirisasi</span>
+            <span class="signal-tag">💹 Tren Ekspor</span>
+            <span class="signal-tag">⚡ Harga Energi</span>
+          </div>
+        </div>
+        <div class="mm-card micro">
+          <div class="mm-header">
+            <span class="mm-icon">🏢</span>
+            <div>
+              <div class="mm-tag en-text" style="background:rgba(90,143,118,.15);color:var(--mid);border-color:rgba(90,143,118,.3);">MICRO</div>
+              <div class="mm-tag id-text" style="display:none;background:rgba(90,143,118,.15);color:var(--mid);border-color:rgba(90,143,118,.3);">MIKRO</div>
+              <div class="mm-subtitle en-text">Internal / Company-Level</div>
+              <div class="mm-subtitle id-text" style="display:none">Internal / Level Perusahaan</div>
+            </div>
+          </div>
+          <p class="mm-desc en-text">Monitors specific conditions within individual companies & sub-sectors.</p>
+          <p class="mm-desc id-text" style="display:none">Memantau kondisi spesifik di satu perusahaan atau subsektor tertentu.</p>
+          <div class="mm-signals">
+            <span class="signal-tag" style="border-color:rgba(90,143,118,.3);color:var(--mid);">📋 Laporan Laba Rugi</span>
+            <span class="signal-tag" style="border-color:rgba(90,143,118,.3);color:var(--mid);">⏰ Pengurangan Lembur</span>
+            <span class="signal-tag" style="border-color:rgba(90,143,118,.3);color:var(--mid);">🚫 Stop Rekrutmen</span>
+            <span class="signal-tag" style="border-color:rgba(90,143,118,.3);color:var(--mid);">🤖 Impor Mesin Otomatis</span>
+            <span class="signal-tag" style="border-color:rgba(90,143,118,.3);color:var(--mid);">📉 Penurunan Order</span>
+            <span class="signal-tag" style="border-color:rgba(90,143,118,.3);color:var(--mid);">📰 Berita Restrukturisasi</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DATA ANALYTICS PIPELINE -->
+    <div class="radar-modal-section">
+      <div class="rms-label en-text">Step 2 — Data Analytics Pipeline</div>
+      <div class="rms-label id-text" style="display:none">Langkah 2 — Pipeline Analitik Data</div>
+      <h4 class="rms-title en-text">Processing the Signals</h4>
+      <h4 class="rms-title id-text" style="display:none">Memproses Sinyal</h4>
+      <div class="analytics-steps">
+        <div class="analytics-step">
+          <div class="astep-num">01</div>
+          <div class="astep-body">
+            <div class="astep-name">Diagnostic Analytics</div>
+            <p class="astep-desc en-text">Analyses <em>why</em> layoffs happened historically. Example: textile sector PHK 2025 increased because of 300% automated machine adoption — this pattern becomes training data.</p>
+            <p class="astep-desc id-text" style="display:none">Menganalisis <em>mengapa</em> PHK terjadi di masa lalu. Contoh: PHK sektor tekstil 2025 meningkat karena adopsi mesin otomatis sebesar 300% — pola ini jadi data latih.</p>
+            <div class="astep-tools"><span>🔧 SQL</span><span>Python Pandas</span></div>
+          </div>
+        </div>
+        <div class="analytics-step">
+          <div class="astep-num">02</div>
+          <div class="astep-body">
+            <div class="astep-name">Descriptive Analytics</div>
+            <p class="astep-desc en-text">Presents a real-time dashboard of current conditions. Example: "Right now, 3.55 million NEET youth are at high risk of permanent market exclusion."</p>
+            <p class="astep-desc id-text" style="display:none">Menyajikan dashboard real-time tentang kondisi saat ini. Contoh: "Saat ini ada 3,55 juta pemuda NEET yang berisiko tinggi tersingkir dari pasar kerja."</p>
+            <div class="astep-tools"><span>📊 Matplotlib</span><span>Dashboard</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ML ENGINE -->
+    <div class="radar-modal-section">
+      <div class="rms-label en-text">Step 3 — Machine Learning Engine</div>
+      <div class="rms-label id-text" style="display:none">Langkah 3 — Mesin Machine Learning</div>
+      <h4 class="rms-title en-text">The Brain Behind the 85% Accuracy</h4>
+      <h4 class="rms-title id-text" style="display:none">Otak di Balik Akurasi 85%</h4>
+      <p style="font-size:.84rem;color:var(--muted);line-height:1.7;margin-bottom:1.2rem;" class="en-text">ML doesn't just read the data — it <strong style="color:var(--text);">learns from it</strong> to predict the future. Three techniques are combined:</p>
+      <p style="font-size:.84rem;color:var(--muted);line-height:1.7;margin-bottom:1.2rem;" class="id-text" style="display:none">ML tidak hanya membaca data — ia <strong style="color:var(--text);">belajar dari data</strong> untuk meramal masa depan. Tiga teknik digabungkan:</p>
+      <div class="ml-cards">
+        <div class="ml-card">
+          <div class="ml-card-header">
+            <span class="ml-num">①</span>
+            <div>
+              <div class="ml-name">Predictive Modeling</div>
+              <div class="ml-type en-text">Supervised Learning</div>
+              <div class="ml-type id-text" style="display:none">Supervised Learning</div>
+            </div>
+          </div>
+          <p class="ml-desc en-text">Trains on historical PHK data. Input: profit decline, raw material cost hike, machinery investment. Output: PHK probability score (0–100%). If score &gt; 80% → early warning triggered.</p>
+          <p class="ml-desc id-text" style="display:none">Dilatih menggunakan data PHK historis. Input: penurunan profit, kenaikan bahan baku, investasi alat. Output: skor probabilitas PHK (0–100%). Jika skor &gt; 80% → peringatan dini aktif.</p>
+        </div>
+        <div class="ml-card">
+          <div class="ml-card-header">
+            <span class="ml-num">②</span>
+            <div>
+              <div class="ml-name">NLP Sentiment Analysis</div>
+              <div class="ml-type en-text">Natural Language Processing</div>
+              <div class="ml-type id-text" style="display:none">Natural Language Processing</div>
+            </div>
+          </div>
+          <p class="ml-desc en-text">Web-scrapes company news & annual reports. If keywords like <em>"restrukturisasi," "efisiensi biaya,"</em> or <em>"optimalisasi tenaga kerja"</em> appear — negative sentiment score rises, raising the PHK risk rating.</p>
+          <p class="ml-desc id-text" style="display:none">Melakukan web scraping berita bisnis & laporan tahunan. Jika muncul kata kunci seperti <em>"restrukturisasi," "efisiensi biaya,"</em> atau <em>"optimalisasi tenaga kerja"</em> — skor sentimen negatif naik dan meningkatkan risiko PHK.</p>
+        </div>
+        <div class="ml-card">
+          <div class="ml-card-header">
+            <span class="ml-num">③</span>
+            <div>
+              <div class="ml-name">Time Series Analysis</div>
+              <div class="ml-type en-text">Temporal Pattern Recognition</div>
+              <div class="ml-type id-text" style="display:none">Pengenalan Pola Temporal</div>
+            </div>
+          </div>
+          <p class="ml-desc en-text">Predicts <em>when</em> layoffs will happen — estimating the time window (e.g. within 6 months) based on annual economic cycle patterns and historical seasonality.</p>
+          <p class="ml-desc id-text" style="display:none">Memprediksi <em>kapan</em> PHK akan terjadi — memperkirakan jendela waktu (misal: dalam 6 bulan) berdasarkan pola siklus ekonomi tahunan dan historis musiman.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- REAL SCENARIO -->
+    <div class="radar-modal-section scenario-section">
+      <div class="rms-label">📍 <span class="en-text">Real Scenario</span><span class="id-text" style="display:none">Skenario Nyata</span></div>
+      <h4 class="rms-title en-text">Case: Textile Factory Worker — 2025</h4>
+      <h4 class="rms-title id-text" style="display:none">Kasus: Pekerja Pabrik Tekstil — 2025</h4>
+      <div class="scenario-timeline">
+        <div class="scenario-step">
+          <div class="sc-dot sc-macro"></div>
+          <div class="sc-content">
+            <div class="sc-time en-text">Q1 2024 — Macro Signal</div>
+            <div class="sc-time id-text" style="display:none">Q1 2024 — Sinyal Makro</div>
+            <p class="en-text">Rupiah weakens to Rp16,500/USD. China increases textile machinery exports to Indonesia by 240%. BEI textile company stocks drop 18% average.</p>
+            <p class="id-text" style="display:none">Rupiah melemah ke Rp16.500/USD. China tingkatkan ekspor mesin tekstil ke Indonesia sebesar 240%. Saham perusahaan tekstil di BEI turun rata-rata 18%.</p>
+          </div>
+        </div>
+        <div class="scenario-step">
+          <div class="sc-dot sc-micro"></div>
+          <div class="sc-content">
+            <div class="sc-time en-text">Q3 2024 — Micro Signal</div>
+            <div class="sc-time id-text" style="display:none">Q3 2024 — Sinyal Mikro</div>
+            <p class="en-text">PT Sandang Jaya's annual report shows profit down 31%. Overtime hours cut by 40%. Recruitment portal shows 0 new postings for 3 months. NLP detects "cost optimization" in press release.</p>
+            <p class="id-text" style="display:none">Laporan tahunan PT Sandang Jaya menunjukkan laba turun 31%. Jam lembur dipotong 40%. Portal rekrutmen tidak ada lowongan baru selama 3 bulan. NLP mendeteksi "optimalisasi biaya" di siaran pers.</p>
+          </div>
+        </div>
+        <div class="scenario-step">
+          <div class="sc-dot sc-alert"></div>
+          <div class="sc-content">
+            <div class="sc-time en-text" style="color:var(--gold);">Q4 2024 — PHK Radar™ Alert</div>
+            <div class="sc-time id-text" style="display:none;color:var(--gold);">Q4 2024 — Peringatan PHK Radar™</div>
+            <p class="en-text">PHK probability score hits <strong style="color:var(--gold);">87%</strong>. Budi, a registered Valtrix user at PT Sandang Jaya, receives: <em>"Your sector risk is HIGH. Start reskilling now — 6 months before potential layoff."</em></p>
+            <p class="id-text" style="display:none">Skor probabilitas PHK mencapai <strong style="color:var(--gold);">87%</strong>. Budi, pengguna Valtrix terdaftar di PT Sandang Jaya, menerima: <em>"Risiko sektormu TINGGI. Mulai reskilling sekarang — 6 bulan sebelum potensi PHK."</em></p>
+          </div>
+        </div>
+        <div class="scenario-step">
+          <div class="sc-dot sc-success"></div>
+          <div class="sc-content">
+            <div class="sc-time en-text" style="color:var(--mid);">Q2 2025 — PHK Happens, Budi Is Ready</div>
+            <div class="sc-time id-text" style="display:none;color:var(--mid);">Q2 2025 — PHK Terjadi, Budi Sudah Siap</div>
+            <p class="en-text">PT Sandang Jaya lays off 800 workers. Budi already completed Phase 1 training and secured a Social Media Manager contract at Rp8M/month — 6 months before the announcement.</p>
+            <p class="id-text" style="display:none">PT Sandang Jaya mem-PHK 800 pekerja. Budi sudah menyelesaikan pelatihan Fase 1 dan mendapat kontrak Social Media Manager senilai Rp8 juta/bulan — 6 bulan sebelum pengumuman PHK.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="radar-modal-section">
+      <div class="rms-label en-text">❓ Frequently Asked Questions</div>
+      <div class="rms-label id-text" style="display:none">❓ Pertanyaan yang Sering Diajukan</div>
+      <div class="faq-list">
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">
+            <span class="en-text">Isn't this a privacy violation — tracking workers?</span>
+            <span class="id-text" style="display:none">Apakah ini melanggar privasi — melacak pekerja?</span>
+            <span class="faq-arrow">›</span>
+          </div>
+          <div class="faq-a">
+            <p class="en-text">No. PHK Radar™ only collects the worker's company name and sector during registration — no salary data, contracts, or personal files. All analysis is based on <strong>public data</strong> (BEI financial reports, BPS statistics, public news) and aggregated industry signals — not individual surveillance.</p>
+            <p class="id-text" style="display:none">Tidak. PHK Radar™ hanya mengumpulkan nama perusahaan dan sektor saat pendaftaran — tanpa data gaji, kontrak, atau file pribadi. Semua analisis berbasis <strong>data publik</strong> (laporan keuangan BEI, statistik BPS, berita publik) dan sinyal industri agregat — bukan pengawasan individu.</p>
+          </div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">
+            <span class="en-text">What if the prediction is wrong and workers panic-resign?</span>
+            <span class="id-text" style="display:none">Bagaimana jika prediksi salah dan pekerja panik resign?</span>
+            <span class="faq-arrow">›</span>
+          </div>
+          <div class="faq-a">
+            <p class="en-text">PHK Radar™ never recommends resigning. It only encourages workers to <strong>start learning a new skill while still employed</strong> — the safest possible position. Even if the prediction is wrong, the worker gained a new skill at zero cost. If it's right, they're fully prepared.</p>
+            <p class="id-text" style="display:none">PHK Radar™ tidak pernah menyarankan resign. Sistem hanya mendorong pekerja untuk <strong>mulai belajar skill baru sambil masih bekerja</strong> — posisi paling aman. Bahkan jika prediksi salah, pekerja tetap mendapat skill baru tanpa biaya. Jika benar, mereka sudah siap sepenuhnya.</p>
+          </div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">
+            <span class="en-text">Why 85% accuracy — how is that measured?</span>
+            <span class="id-text" style="display:none">Mengapa akurasi 85% — bagaimana cara mengukurnya?</span>
+            <span class="faq-arrow">›</span>
+          </div>
+          <div class="faq-a">
+            <p class="en-text">The model is backtested against 5 years of Indonesian labor data from BPS and Kemenaker. It correctly predicted 85% of mass layoff events (>50 workers) in manufacturing and digital sectors within a 6-month window. The remaining 15% were either delayed PHK or government-intervened cases.</p>
+            <p class="id-text" style="display:none">Model diuji mundur (backtested) terhadap 5 tahun data ketenagakerjaan Indonesia dari BPS dan Kemenaker. Model berhasil memprediksi 85% kejadian PHK massal (&gt;50 pekerja) di sektor manufaktur dan digital dalam jendela 6 bulan. Sisa 15% adalah PHK yang tertunda atau ada intervensi pemerintah.</p>
+          </div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">
+            <span class="en-text">What data sources does PHK Radar™ use?</span>
+            <span class="id-text" style="display:none">Sumber data apa yang digunakan PHK Radar™?</span>
+            <span class="faq-arrow">›</span>
+          </div>
+          <div class="faq-a">
+            <p class="en-text">All public sources: BPS (national statistics), BEI (public company financials), Kemenaker (labor reports), BKPM (investment data), Bank Indonesia (monetary data), and news APIs (Kompas, Bisnis Indonesia, Reuters). Zero private or personally identifiable data is collected.</p>
+            <p class="id-text" style="display:none">Seluruh sumber publik: BPS (statistik nasional), BEI (laporan keuangan perusahaan publik), Kemenaker (laporan ketenagakerjaan), BKPM (data investasi), Bank Indonesia (data moneter), dan API berita (Kompas, Bisnis Indonesia, Reuters). Tidak ada data pribadi yang dikumpulkan.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:1.5rem;">
+      <button class="btn btn-primary btn-full" onclick="closeModal('modal-radar-how');openModal('modal-register')">
+        <span class="en-text">🚀 Register & Get Early Warning</span>
+        <span class="id-text" style="display:none">🚀 Daftar & Dapatkan Peringatan Dini</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ IMPACT ═══ -->
+<section id="impact" class="impact-section reveal">
+  <div class="section-label">
+    <span class="en-text">Projected Impact</span>
+    <span class="id-text" style="display:none">Proyeksi Dampak</span>
+  </div>
+  <h2 class="section-title en-text">IMPACT AT SCALE</h2>
+  <h2 class="section-title id-text" style="display:none">DAMPAK SKALA BESAR</h2>
+  <p class="section-sub en-text">From pilot to national transformation — a clear roadmap to reshape Indonesia's labor landscape.</p>
+  <p class="section-sub id-text" style="display:none">Dari pilot hingga transformasi nasional — peta jalan jelas untuk mengubah lanskap ketenagakerjaan Indonesia.</p>
+  <div class="impact-grid">
+    <div class="impact-card reveal reveal-delay-1">
+      <div class="impact-year en-text">Year 1 · Q3 2026 Pilot</div>
+      <div class="impact-year id-text" style="display:none">Tahun 1 · Pilot Q3 2026</div>
+      <div class="impact-num" data-counter="100" data-suffix="K">100K</div>
+      <p class="impact-desc en-text">Workers saved from long-term unemployment across 20 sub-sectors</p>
+      <p class="impact-desc id-text" style="display:none">Pekerja diselamatkan dari pengangguran jangka panjang di 20 subsektor</p>
+    </div>
+    <div class="impact-card reveal reveal-delay-2">
+      <div class="impact-year en-text">Year 3 · Scale 2028</div>
+      <div class="impact-year id-text" style="display:none">Tahun 3 · Skalasi 2028</div>
+      <div class="impact-num" data-counter="1" data-suffix="M">1M</div>
+      <p class="impact-desc en-text">Workers transformed into skilled digital, green & agro professionals</p>
+      <p class="impact-desc id-text" style="display:none">Pekerja bertransformasi menjadi profesional terampil</p>
+    </div>
+    <div class="impact-card reveal reveal-delay-3">
+      <div class="impact-year en-text">Year 5 · National Goal</div>
+      <div class="impact-year id-text" style="display:none">Tahun 5 · Target Nasional</div>
+      <div class="impact-num">-60%</div>
+      <p class="impact-desc en-text">National layoff rate reduced through pre-emptive reskilling</p>
+      <p class="impact-desc id-text" style="display:none">Angka PHK nasional turun melalui reskilling pre-emptif</p>
+    </div>
+  </div>
+  <div class="revenue-compare reveal">
+    <div class="rev-card">
+      <div class="rev-label en-text">Before Valtrix</div>
+      <div class="rev-label id-text" style="display:none">Sebelum Valtrix</div>
+      <div class="rev-num rev-before">Rp3–4M</div>
+      <div class="rev-sub en-text">/ month average</div>
+      <div class="rev-sub id-text" style="display:none">/ bulan rata-rata</div>
+    </div>
+    <div class="rev-arrow">→</div>
+    <div class="rev-card">
+      <div class="rev-label en-text">After Valtrix</div>
+      <div class="rev-label id-text" style="display:none">Setelah Valtrix</div>
+      <div class="rev-num rev-after">Rp7–15M</div>
+      <div class="rev-sub en-text">/ month target</div>
+      <div class="rev-sub id-text" style="display:none">/ bulan target</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ EMPLOYER SECTION ═══ -->
+<section id="employer" class="employer-section reveal">
+  <div class="section-label">
+    <span class="en-text">For Employers</span>
+    <span class="id-text" style="display:none">Untuk Employer</span>
+  </div>
+  <h2 class="section-title en-text">HIRE RESKILLED TALENT</h2>
+  <h2 class="section-title id-text" style="display:none">REKRUT TALENTA RESKILLED</h2>
+  <p class="section-sub en-text">Partner with Valtrix to access a pipeline of motivated, pre-trained workers — subsidized by the government.</p>
+  <p class="section-sub id-text" style="display:none">Bermitra dengan Valtrix untuk mengakses pipeline pekerja yang terlatih dan termotivasi — disubsidi pemerintah.</p>
+  <div class="employer-grid">
+    <div class="employer-benefits reveal">
+      <div class="benefit-row">
+        <div class="benefit-icon">💸</div>
+        <div class="benefit-text">
+          <h4 class="en-text">Rp2M/Month Subsidy</h4>
+          <h4 class="id-text" style="display:none">Subsidi Rp2 Juta/Bulan</h4>
+          <p class="en-text">Receive Rp2,000,000 per reskilled worker per month for the first 6 months — directly reducing your HR costs.</p>
+          <p class="id-text" style="display:none">Dapatkan Rp2.000.000 per pekerja reskill per bulan selama 6 bulan pertama — langsung mengurangi biaya HR kamu.</p>
+        </div>
+      </div>
+      <div class="benefit-row">
+        <div class="benefit-icon">✅</div>
+        <div class="benefit-text">
+          <h4 class="en-text">Pre-Verified Skills</h4>
+          <h4 class="id-text" style="display:none">Skill Sudah Terverifikasi</h4>
+          <p class="en-text">Every Valtrix graduate holds a micro-credential and has completed a real industry project. Zero onboarding time wasted.</p>
+          <p class="id-text" style="display:none">Setiap lulusan Valtrix memiliki micro-credential dan telah menyelesaikan proyek industri nyata. Tidak ada waktu onboarding yang terbuang.</p>
+        </div>
+      </div>
+      <div class="benefit-row">
+        <div class="benefit-icon">🎯</div>
+        <div class="benefit-text">
+          <h4 class="en-text">Track-Matched Talent</h4>
+          <h4 class="id-text" style="display:none">Talenta Cocok Jalur</h4>
+          <p class="en-text">Workers are matched to your industry sector via AI — Digital, Green Energy, or Agro-Industry based on your needs.</p>
+          <p class="id-text" style="display:none">Pekerja dicocokkan ke sektor industrimu via AI — Digital, Energi Hijau, atau Agro-Industri sesuai kebutuhanmu.</p>
+        </div>
+      </div>
+      <div class="benefit-row">
+        <div class="benefit-icon">📊</div>
+        <div class="benefit-text">
+          <h4 class="en-text">CSR & ESG Credit</h4>
+          <h4 class="id-text" style="display:none">Kredit CSR & ESG</h4>
+          <p class="en-text">Partnership with Valtrix qualifies for CSR reporting under SDG 8 & SDG 4 — enhancing your ESG profile with stakeholders.</p>
+          <p class="id-text" style="display:none">Kemitraan dengan Valtrix memenuhi syarat pelaporan CSR di bawah SDG 8 & SDG 4 — meningkatkan profil ESG kamu.</p>
+        </div>
+      </div>
+    </div>
+    <div class="employer-form-card reveal">
+      <h3 class="en-text">BECOME A PARTNER EMPLOYER</h3>
+      <h3 class="id-text" style="display:none">JADI EMPLOYER MITRA</h3>
+      <form id="employer-form" onsubmit="submitEmployerForm(event)" style="display:flex;flex-direction:column;gap:1.1rem;">
+        <div class="form-group">
+          <label class="form-label en-text">Company Name</label>
+          <label class="form-label id-text" style="display:none">Nama Perusahaan</label>
+          <input id="emp-company" class="form-input" type="text" placeholder="e.g. PT Maju Bersama">
+        </div>
+        <div class="form-group">
+          <label class="form-label en-text">Contact Person</label>
+          <label class="form-label id-text" style="display:none">Nama Kontak</label>
+          <input id="emp-contact" class="form-input" type="text" placeholder="e.g. Budi Santoso">
+        </div>
+        <div class="form-group">
+          <label class="form-label en-text">Business Email</label>
+          <label class="form-label id-text" style="display:none">Email Bisnis</label>
+          <input id="emp-email" class="form-input" type="email" placeholder="e.g. hr@company.co.id">
+        </div>
+        <div class="form-group">
+          <label class="form-label en-text">Industry Sector</label>
+          <label class="form-label id-text" style="display:none">Sektor Industri</label>
+          <select id="emp-sector" class="form-select">
+            <option value="" class="en-text">— Select Sector —</option>
+            <option value="digital" class="en-text">Digital & Tech</option>
+            <option value="green" class="en-text">Green Energy & Environment</option>
+            <option value="agro" class="en-text">Agriculture & Food Tech</option>
+            <option value="mfg" class="en-text">Manufacturing</option>
+            <option value="other" class="en-text">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label en-text">Workers Needed (Monthly)</label>
+          <label class="form-label id-text" style="display:none">Pekerja Dibutuhkan (per Bulan)</label>
+          <input id="emp-workers" class="form-input" type="number" placeholder="e.g. 20" min="1">
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">
+          <span class="en-text">🤝 Submit Partnership Request</span>
+          <span class="id-text" style="display:none">🤝 Kirim Permintaan Kemitraan</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SWOT ═══ -->
+<section id="swot" class="swot-section reveal">
+  <div class="section-label">SWOT Analysis</div>
+  <h2 class="section-title en-text">STRATEGIC ASSESSMENT</h2>
+  <h2 class="section-title id-text" style="display:none">ANALISIS STRATEGIS</h2>
+  <div class="swot-grid">
+    <div class="swot-card s reveal reveal-delay-1">
+      <div class="swot-header">💪 <span class="en-text">Strengths</span><span class="id-text" style="display:none">Kekuatan</span></div>
+      <div class="swot-items">
+        <div class="swot-item en-text">Revenue share model creates high worker motivation</div>
+        <div class="swot-item id-text" style="display:none">Revenue share model ciptakan motivasi pekerja tinggi</div>
+        <div class="swot-item en-text">PHK Radar™ AI predicts layoffs with 85% accuracy</div>
+        <div class="swot-item id-text" style="display:none">PHK Radar™ prediksi PHK dengan akurasi 85%</div>
+        <div class="swot-item en-text">3 future-proof, automation-resistant pathways</div>
+        <div class="swot-item id-text" style="display:none">3 jalur tahan otomatisasi masa depan</div>
+      </div>
+    </div>
+    <div class="swot-card w reveal reveal-delay-2">
+      <div class="swot-header">⚠️ <span class="en-text">Weaknesses</span><span class="id-text" style="display:none">Kelemahan</span></div>
+      <div class="swot-items">
+        <div class="swot-item en-text">Resistance from workers aged 40+ to digital shift</div>
+        <div class="swot-item id-text" style="display:none">Resistensi pekerja >40 tahun terhadap pergeseran digital</div>
+        <div class="swot-item en-text">Initial budget requirement of Rp50 Billion</div>
+        <div class="swot-item id-text" style="display:none">Kebutuhan anggaran awal Rp50 Miliar</div>
+        <div class="swot-item en-text">Low digital literacy in primary target demographic</div>
+        <div class="swot-item id-text" style="display:none">Literasi digital rendah di target demografi utama</div>
+      </div>
+    </div>
+    <div class="swot-card o reveal reveal-delay-1">
+      <div class="swot-header">🚀 <span class="en-text">Opportunities</span><span class="id-text" style="display:none">Peluang</span></div>
+      <div class="swot-items">
+        <div class="swot-item en-text">Hilirisasi policy creates massive skilled-worker demand</div>
+        <div class="swot-item id-text" style="display:none">Kebijakan hilirisasi ciptakan permintaan besar pekerja terampil</div>
+        <div class="swot-item en-text">Tech giants CSR funding potential (Google, Microsoft)</div>
+        <div class="swot-item id-text" style="display:none">Potensi pendanaan CSR tech giants (Google, Microsoft)</div>
+        <div class="swot-item en-text">Green economy boom creating entirely new job categories</div>
+        <div class="swot-item id-text" style="display:none">Boom ekonomi hijau ciptakan kategori pekerjaan baru</div>
+      </div>
+    </div>
+    <div class="swot-card t reveal reveal-delay-2">
+      <div class="swot-header">⚡ <span class="en-text">Threats</span><span class="id-text" style="display:none">Ancaman</span></div>
+      <div class="swot-items">
+        <div class="swot-item en-text">Global recession 2026 could reduce employer absorption</div>
+        <div class="swot-item id-text" style="display:none">Resesi global 2026 dapat kurangi penyerapan employer</div>
+        <div class="swot-item en-text">Strict labor regulations may limit platform flexibility</div>
+        <div class="swot-item id-text" style="display:none">Regulasi ketenagakerjaan ketat dapat batasi fleksibilitas</div>
+        <div class="swot-item en-text">Competition from foreign reskilling platforms</div>
+        <div class="swot-item id-text" style="display:none">Kompetisi dari platform reskilling asing</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SMART ═══ -->
+<section id="smart" class="smart-section reveal">
+  <div class="section-label">
+    <span class="en-text">Goal Framework</span>
+    <span class="id-text" style="display:none">Kerangka Tujuan</span>
+  </div>
+  <h2 class="section-title">SMART ANALYSIS</h2>
+  <div class="smart-grid">
+    <div class="smart-row reveal">
+      <div class="smart-letter">S</div>
+      <div class="smart-content">
+        <h4 class="en-text">Specific</h4><h4 class="id-text" style="display:none">Spesifik</h4>
+        <p class="en-text">100,000 laid-off workers across 20 sub-sectors vulnerable to automation in manufacturing & digital</p>
+        <p class="id-text" style="display:none">100.000 pekerja ter-PHK di 20 subsektor manufaktur & digital yang rentan terhadap otomatisasi</p>
+      </div>
+    </div>
+    <div class="smart-row reveal">
+      <div class="smart-letter">M</div>
+      <div class="smart-content">
+        <h4 class="en-text">Measurable</h4><h4 class="id-text" style="display:none">Terukur</h4>
+        <p class="en-text">80% redeployment rate + target income Rp7M/month per worker post-graduation</p>
+        <p class="id-text" style="display:none">80% tingkat redeployment + target penghasilan Rp7 juta/bulan per pekerja setelah lulus</p>
+      </div>
+    </div>
+    <div class="smart-row reveal">
+      <div class="smart-letter">A</div>
+      <div class="smart-content">
+        <h4 class="en-text">Achievable</h4><h4 class="id-text" style="display:none">Dapat Dicapai</h4>
+        <p class="en-text">Leverages 1.7M SMK Pusat Keunggulan students as training infrastructure base</p>
+        <p class="id-text" style="display:none">Memanfaatkan 1,7 juta siswa SMK Pusat Keunggulan sebagai basis infrastruktur pelatihan</p>
+      </div>
+    </div>
+    <div class="smart-row reveal">
+      <div class="smart-letter">R</div>
+      <div class="smart-content">
+        <h4 class="en-text">Relevant</h4><h4 class="id-text" style="display:none">Relevan</h4>
+        <p class="en-text">Directly addresses SDG 8 — decent work & economic growth — and Prabowo's hilirisasi agenda</p>
+        <p class="id-text" style="display:none">Langsung menyasar SDG 8 — pekerjaan layak & pertumbuhan ekonomi — dan agenda hilirisasi Prabowo</p>
+      </div>
+    </div>
+    <div class="smart-row reveal">
+      <div class="smart-letter">T</div>
+      <div class="smart-content">
+        <h4 class="en-text">Time-Bound</h4><h4 class="id-text" style="display:none">Berbatas Waktu</h4>
+        <p class="en-text">Pilot Q3 2026 → Scale 100K workers 2027 → 1 million workers transformed by 2028</p>
+        <p class="id-text" style="display:none">Pilot Q3 2026 → Skalasi 100K pekerja 2027 → 1 juta pekerja bertransformasi pada 2028</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div>
+    <div class="footer-logo"><img src="logo.PNG" alt="Valtrix" style="height:64px;object-fit:contain;"></div>
+    <p class="footer-text en-text">Presented at IYG#5 Bangkok · April 6–9, 2026<br>Indonesia Youth Delegation</p>
+    <p class="footer-text id-text" style="display:none">Dipresentasikan di IYG#5 Bangkok · 6–9 April 2026<br>Delegasi Pemuda Indonesia</p>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:.5rem;align-items:flex-end;">
+    <div class="footer-badge">IYG#5 · BANGKOK 2026</div>
+    <button class="btn btn-sm btn-primary" onclick="openModal('modal-register')">
+      <span class="en-text">Join Valtrix</span>
+      <span class="id-text" style="display:none">Gabung Valtrix</span>
+    </button>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════
+     MODALS
+     ═══════════════════════════════════════ -->
+
+<!-- MODAL: REGISTRATION -->
+<div class="modal-overlay" id="modal-register">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title en-text">START YOUR JOURNEY</div>
+        <div class="modal-title id-text" style="display:none">MULAI PERJALANANMU</div>
+        <p style="font-size:.82rem;color:var(--muted);margin-top:.3rem;" class="en-text">Join Valtrix — Free for all laid-off workers</p>
+        <p style="font-size:.82rem;color:var(--muted);margin-top:.3rem;" class="id-text" style="display:none">Bergabung Valtrix — Gratis untuk semua pekerja ter-PHK</p>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-register')">✕</button>
+    </div>
+
+    <div class="steps-bar">
+      <div class="step-dot active"></div>
+      <div class="step-dot"></div>
+      <div class="step-dot"></div>
+    </div>
+    <div class="step-label" id="reg-step-label"><span>1/3</span> — Personal Info</div>
+
+    <!-- STEP 1 -->
+    <div class="form-step active">
+      <div class="form-group">
+        <label class="form-label en-text">Full Name</label>
+        <label class="form-label id-text" style="display:none">Nama Lengkap</label>
+        <input id="reg-name" class="form-input" type="text" placeholder="e.g. Budi Santoso">
+        <span class="form-error" id="reg-name-err">Name is required</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label en-text">Email Address</label>
+        <label class="form-label id-text" style="display:none">Alamat Email</label>
+        <input id="reg-email" class="form-input" type="email" placeholder="e.g. budi@email.com">
+        <span class="form-error" id="reg-email-err">Valid email is required</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label en-text">Phone Number</label>
+        <label class="form-label id-text" style="display:none">Nomor Telepon</label>
+        <input id="reg-phone" class="form-input" type="tel" placeholder="e.g. 08123456789">
+        <span class="form-error" id="reg-phone-err">Phone number is required</span>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label en-text">Age</label>
+          <label class="form-label id-text" style="display:none">Usia</label>
+          <input class="form-input" type="number" placeholder="e.g. 28" min="18" max="55">
+        </div>
+        <div class="form-group">
+          <label class="form-label en-text">Province</label>
+          <label class="form-label id-text" style="display:none">Provinsi</label>
+          <select class="form-select">
+            <option class="en-text">— Select —</option>
+            <option>DKI Jakarta</option><option>Jawa Barat</option><option>Jawa Tengah</option>
+            <option>Jawa Timur</option><option>Banten</option><option>Sumatra Utara</option>
+            <option class="en-text">Other Province</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="form-step">
+      <div class="form-group">
+        <label class="form-label en-text">Former Industry / Sector</label>
+        <label class="form-label id-text" style="display:none">Industri / Sektor Sebelumnya</label>
+        <select id="reg-sector" class="form-select">
+          <option value="" class="en-text">— Select your former industry —</option>
+          <option value="textile">Textile / Garment Manufacturing</option>
+          <option value="digital">Digital Media / Content</option>
+          <option value="retail">Retail / Traditional Trade</option>
+          <option value="admin">Data Entry / Administration</option>
+          <option value="food">Food & Beverage Processing</option>
+          <option value="construct">Construction</option>
+          <option value="transport">Transportation / Logistics</option>
+          <option value="other">Other</option>
+        </select>
+        <span class="form-error" id="reg-sector-err">Please select your former sector</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label en-text">Years of Work Experience</label>
+        <label class="form-label id-text" style="display:none">Tahun Pengalaman Kerja</label>
+        <select id="reg-years" class="form-select">
+          <option value="">— Select —</option>
+          <option value="0-2">0–2 years</option>
+          <option value="3-5">3–5 years</option>
+          <option value="6-10">6–10 years</option>
+          <option value="10+">10+ years</option>
+        </select>
+        <span class="form-error" id="reg-years-err">Please select your experience</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label en-text">Last Education Level</label>
+        <label class="form-label id-text" style="display:none">Tingkat Pendidikan Terakhir</label>
+        <select class="form-select">
+          <option class="en-text">— Select —</option>
+          <option>SD (Primary)</option><option>SMP (Junior High)</option>
+          <option>SMA/SMK (Senior High)</option><option>D3/D4 (Diploma)</option>
+          <option>S1 (Bachelor)</option><option>S2+ (Postgraduate)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label en-text">Smartphone & Internet Access</label>
+        <label class="form-label id-text" style="display:none">Akses Smartphone & Internet</label>
+        <select class="form-select">
+          <option class="en-text">— Select —</option>
+          <option class="en-text">Yes, I have both</option>
+          <option class="en-text">Smartphone only</option>
+          <option class="en-text">Limited / Shared access</option>
+          <option class="en-text">No access currently</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="form-step">
+      <p style="font-size:.88rem;color:var(--muted);margin-bottom:.5rem;" class="en-text">Choose your preferred transformation track. Not sure? <strong style="color:var(--gold);cursor:pointer;" onclick="closeModal('modal-register');initQuiz()">Take the quiz first</strong>.</p>
+      <p style="font-size:.88rem;color:var(--muted);margin-bottom:.5rem;" class="id-text" style="display:none">Pilih jalur transformasi yang kamu inginkan. Belum yakin? <strong style="color:var(--gold);cursor:pointer;" onclick="closeModal('modal-register');initQuiz()">Ikuti kuis dulu</strong>.</p>
+
+      <div class="quiz-options" style="gap:.6rem;">
+        <label class="quiz-option selected">
+          <input type="radio" name="reg-track" value="digital" checked>
+          <span class="quiz-radio"></span>
+          <span class="quiz-option-text">
+            <strong>💻 Digital Services</strong><br>
+            <span style="font-size:.78rem;" class="en-text">Social Media, Ads, Chatbot Training — Rp7–15M/month</span>
+            <span style="font-size:.78rem;" class="id-text" style="display:none">Media Sosial, Iklan, Chatbot Training — Rp7–15 juta/bulan</span>
+          </span>
+        </label>
+        <label class="quiz-option">
+          <input type="radio" name="reg-track" value="green">
+          <span class="quiz-radio"></span>
+          <span class="quiz-option-text">
+            <strong>🌱 Green Economy</strong><br>
+            <span style="font-size:.78rem;" class="en-text">Solar Installation, Waste-to-Energy — Rp6–12M/month</span>
+            <span style="font-size:.78rem;" class="id-text" style="display:none">Instalasi Solar, Waste-to-Energy — Rp6–12 juta/bulan</span>
+          </span>
+        </label>
+        <label class="quiz-option">
+          <input type="radio" name="reg-track" value="agro">
+          <span class="quiz-radio"></span>
+          <span class="quiz-option-text">
+            <strong>🌾 Agro-Industry 4.0</strong><br>
+            <span style="font-size:.78rem;" class="en-text">Smart Farming, Drone Ops, Cold Chain — Rp5–10M/month</span>
+            <span style="font-size:.78rem;" class="id-text" style="display:none">Smart Farming, Drone, Cold Chain — Rp5–10 juta/bulan</span>
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <!-- FORM BUTTONS -->
+    <div style="display:flex;gap:.75rem;margin-top:1.8rem;justify-content:flex-end;">
+      <button id="reg-prev" class="btn btn-secondary" style="display:none" onclick="regPrev()">
+        <span class="en-text">← Back</span>
+        <span class="id-text" style="display:none">← Kembali</span>
+      </button>
+      <button id="reg-next" class="btn btn-primary" onclick="regNext()">
+        <span class="en-text">Next Step →</span>
+        <span class="id-text" style="display:none">Langkah Berikutnya →</span>
+      </button>
+      <button id="reg-submit" class="btn btn-primary" style="display:none" onclick="submitRegistration()">
+        <span class="en-text">🚀 Register Now</span>
+        <span class="id-text" style="display:none">🚀 Daftar Sekarang</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: QUIZ -->
+<div class="modal-overlay" id="modal-quiz">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title en-text">SKILL ASSESSMENT</div>
+        <div class="modal-title id-text" style="display:none">ASESMEN SKILL</div>
+        <p style="font-size:.82rem;color:var(--muted);margin-top:.3rem;" class="en-text">5 questions to find your ideal transformation track</p>
+        <p style="font-size:.82rem;color:var(--muted);margin-top:.3rem;" class="id-text" style="display:none">5 pertanyaan untuk menemukan jalur transformasi idealmu</p>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-quiz')">✕</button>
+    </div>
+
+    <div class="quiz-progress-bar">
+      <div class="quiz-progress-fill" id="quiz-progress-fill" style="width:20%"></div>
+    </div>
+    <div class="quiz-progress" id="quiz-progress-text">Question 1 of 5</div>
+
+    <div id="quiz-q-area">
+      <div class="quiz-question" id="quiz-question-text"></div>
+      <div class="quiz-options" id="quiz-options"></div>
+      <div style="margin-top:1.5rem;display:flex;justify-content:flex-end;">
+        <button class="btn btn-primary" id="quiz-btn-next" onclick="quizNext()">Next →</button>
+      </div>
+    </div>
+
+    <div id="quiz-result" class="quiz-result" style="display:none;">
+      <div style="font-size:.75rem;font-family:'JetBrains Mono',monospace;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:.5rem;" id="quiz-result-title">Your Recommended Track:</div>
+      <div class="result-track-badge" id="quiz-result-badge"></div>
+      <p style="font-size:.88rem;color:var(--muted);line-height:1.65;margin-top:.8rem;" id="quiz-result-desc"></p>
+      <div class="result-jobs" id="quiz-result-jobs"></div>
+      <div style="margin-top:1.8rem;display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" id="quiz-result-cta" onclick="quizToCTA()">📋 Register for this Track</button>
+        <button class="btn btn-secondary btn-sm" onclick="initQuiz()">
+          <span class="en-text">↺ Retake Quiz</span>
+          <span class="id-text" style="display:none">↺ Ulangi Kuis</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: SIMULATION -->
+<div class="modal-overlay" id="modal-simulation">
+  <div class="modal" style="max-width:700px;">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title en-text">YOUR 90-DAY SIMULATION</div>
+        <div class="modal-title id-text" style="display:none">SIMULASI 90 HARI KAMU</div>
+        <p style="font-size:.82rem;color:var(--muted);margin-top:.3rem;" class="en-text">Walk through your transformation journey phase by phase</p>
+        <p style="font-size:.82rem;color:var(--muted);margin-top:.3rem;" class="id-text" style="display:none">Telusuri perjalanan transformasimu fase demi fase</p>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-simulation')">✕</button>
+    </div>
+    <div id="sim-modal-container" style="display:flex;flex-direction:column;gap:1rem;"></div>
+    <div style="display:flex;gap:1rem;margin-top:1.5rem;align-items:center;flex-wrap:wrap;">
+      <button class="btn btn-primary" id="sim-modal-next" onclick="simModalNext()">
+        <span class="en-text">Next Phase →</span>
+        <span class="id-text" style="display:none">Fase Berikutnya →</span>
+      </button>
+      <button class="btn btn-secondary" id="sim-modal-done" style="display:none" onclick="simComplete()">
+        <span class="en-text">🎉 Register Now</span>
+        <span class="id-text" style="display:none">🎉 Daftar Sekarang</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CHATBOT ═══ -->
+<div class="chatbot-widget">
+  <div class="chatbot-window" id="chatbot-window">
+    <div class="chatbot-header">
+      <div class="chatbot-avatar">🤖</div>
+      <div>
+        <div class="chatbot-name">Valtrix AI</div>
+        <div class="chatbot-status">
+          <span class="pulse"></span>
+          <span class="en-text">Your reskilling advisor</span>
+          <span class="id-text" style="display:none">Advisor reskilling kamu</span>
+        </div>
+      </div>
+    </div>
+    <div class="chatbot-messages" id="chatbot-messages"></div>
+    <div class="chat-suggestions" id="chat-suggestions">
+      <button class="chat-suggest-btn" onclick="sendChatMessage('What tracks are available?')">What tracks?</button>
+      <button class="chat-suggest-btn" onclick="sendChatMessage('How does the 90-day program work?')">90-day program?</button>
+      <button class="chat-suggest-btn" onclick="sendChatMessage('How much will I earn?')">Salary?</button>
+      <button class="chat-suggest-btn" onclick="sendChatMessage('Is it free?')">Is it free?</button>
+    </div>
+    <div class="chatbot-input-row">
+      <input class="chatbot-input" id="chatbot-input" type="text" placeholder="Ask me anything..." onkeydown="handleChatKey(event)">
+      <button class="chatbot-send" onclick="sendChatMessage()">➤</button>
+    </div>
+  </div>
+  <button class="chatbot-toggle" id="chatbot-toggle" onclick="toggleChatbot()" aria-label="Chat with ValtrixBot">💬</button>
+</div>
+
+<script src="script.js"></script>
+
+<script>
+  /* ── OVERRIDE openModal so modals init correctly ── */
+  const _origOpen = openModal;
+  window.openModal = function(id) {
+    _origOpen(id);
+    if (id === 'modal-register') initRegistration();
+    if (id === 'modal-quiz') {
+      APP.quiz = { current: 0, answers: [], result: null };
+      renderQuizQuestion();
+    }
+    if (id === 'modal-simulation') {
+      APP.sim.currentPhase = 0;
+      renderSimModal();
+    }
+  };
+
+  /* ── Listen for custom event dispatched by submitRegistration ── */
+  document.getElementById('modal-simulation').addEventListener('sim:open', () => {
+    renderSimModal();
+  });
+
+  /* ── Render simulation phases inside the MODAL ── */
+  function renderSimModal() {
+    const container = document.getElementById('sim-modal-container');
+    if (!container) return;
+    container.innerHTML = '';
+    const phases = SIM_PHASES[APP.lang];
+
+    phases.forEach((phase, i) => {
+      const isActive    = i === APP.sim.currentPhase;
+      const isCompleted = i < APP.sim.currentPhase;
+      const div = document.createElement('div');
+      div.className = `sim-phase ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`;
+      div.innerHTML = `
+        <div class="sim-num">${String(i+1).padStart(2,'0')}</div>
+        <div class="sim-info">
+          <div class="sim-weeks">${phase.weeks}</div>
+          <div class="sim-title">${phase.title}</div>
+          <div class="sim-desc">${phase.desc}</div>
+          <div class="sim-detail">
+            <div class="sim-detail-inner">
+              ${phase.tasks.map(t => `<div class="sim-task"><span class="sim-task-icon">${t.icon}</span><span>${t.text}</span></div>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="sim-status">
+          <span class="sim-status-dot ${isCompleted?'status-done':isActive?'status-active':'status-next'}"></span>
+          <span>${isCompleted?(APP.lang==='en'?'Done':'Selesai'):isActive?(APP.lang==='en'?'Active':'Aktif'):(APP.lang==='en'?'Next':'Berikutnya')}</span>
+        </div>
+      `;
+      div.addEventListener('click', () => { APP.sim.currentPhase = i; renderSimModal(); });
+      container.appendChild(div);
+    });
+
+    const nxt  = document.getElementById('sim-modal-next');
+    const done = document.getElementById('sim-modal-done');
+    if (nxt)  nxt.style.display  = APP.sim.currentPhase < 2 ? 'flex' : 'none';
+    if (done) done.style.display = APP.sim.currentPhase === 2 ? 'flex' : 'none';
+  }
+
+  function simModalNext() {
+    if (APP.sim.currentPhase < 2) { APP.sim.currentPhase++; renderSimModal(); }
+  }
+
+  /* ── Quiz option click inside register modal ── */
+  document.querySelectorAll('#modal-register .quiz-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('#modal-register .quiz-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+    });
+  });
+
+  /* ── "Start Simulation" button on inline section (not modal) ── */
+  // The inline sim section already uses renderSimulation() from script.js
+  // The modal sim is separate — simModalNext() handles that
+</script>
+</body>
+</html>
